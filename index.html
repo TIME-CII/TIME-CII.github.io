@@ -1,11 +1,184 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>TIME Experiment</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TIME | Tomographic Ionized-carbon Mapping Experiment</title>
   <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
 </head>
 <body>
-  <h1>TIME Experiment</h1>
-  <p>Tomographic Ionized-carbon Mapping Experiment</p>
+  <header class="nav-shell">
+    <a href="index.html"><img src="images/TIME_logo.png" alt="TIME" class="brand-logo"></a>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="science.html">Science</a>
+      <a href="how-to.html">How To</a>
+      <a href="team.html">Team</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero__text">
+        <p class="eyebrow">Peering into the first billion years of galaxies</p>
+        <h1>TIME</h1>
+        <h1>Tomographic Ionized-carbon Mapping Experiment </h1>
+        <p class="lede" style="text-align: center;">TIME maps the faint glow of ionized carbon in the early universe using cryogenic spectrometers on a precision millimeter telescope.</p>
+        <div class="actions">
+          <a class="btn primary" href="#science">See the science goals</a>
+          <a class="btn primary" href="how-to.html">Explore how-to guides</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="facts-section">
+      <div class="facts-content">
+        <div class="hero__card">
+          <p class="label">Fast facts</p>
+          <ul>
+            <li>Millimeter-wave grating spectrometers cooled to a few hundred mK</li>
+            <li>Transition edge sensor (TES) arrays detect redshifted [CII] line emission</li>
+            <li>Mounted on the ARO 12-meter telescope at Kitt Peak, Arizona</li>
+            <li>Targets galaxies during cosmic dawn (roughly z ~ 5 - 9)</li>
+          </ul>
+        </div>
+        <div class="instrument-image">
+          <img src="https://via.placeholder.com/400x300?text=Instrument+Image" alt="TIME Instrument">
+        </div>
+      </div>
+    </section>
+
+    <section id="mission" class="panel">
+      <div class="section-head">
+        <p class="eyebrow">Why TIME</p>
+        <h2>Mapping the growth of early galaxies</h2>
+      </div>
+      <div class="grid two">
+        <div class="card">
+          <h3>Intensity mapping</h3>
+          <p>Instead of finding individual galaxies, TIME measures the integrated [C II] glow across wide sky areas. This reveals how star formation and metal enrichment progressed across cosmic time.</p>
+        </div>
+        <div class="card">
+          <h3>Cosmic dawn window</h3>
+          <p>The redshifted 158 μm [C II] line arrives at millimeter wavelengths. TIME scans these bands to build three-dimensional tomographic maps of structure in the first billion years.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="instrument" class="panel muted">
+      <div class="section-head">
+        <p class="eyebrow">Hardware</p>
+        <h2>Purpose-built millimeter spectrometers</h2>
+      </div>
+      <div class="grid three">
+        <div class="card">
+          <h3>TES focal planes</h3>
+          <p>Superconducting transition edge sensors provide background-limited sensitivity with time-domain multiplexing, allowing many channels to be read out efficiently.</p>
+        </div>
+        <div class="card">
+          <h3>Grating spectrometers</h3>
+          <p>Diffraction gratings split incoming light into finely spaced frequency bins, letting TIME capture spectra over broad millimeter bands simultaneously.</p>
+        </div>
+        <div class="card">
+          <h3>Cryogenic chain</h3>
+          <p>A closed-cycle cryostat cools optics and detectors to sub-K temperatures, reducing thermal noise and stabilizing the focal plane.</p>
+        </div>
+      </div>
+      <div class="metrics">
+        <div class="metric"><span>~12 m</span><p>Aperture of the ARO telescope hosting TIME</p></div>
+        <div class="metric"><span>mm bands</span><p>Observes redshifted [C II] at millimeter wavelengths</p></div>
+        <div class="metric"><span>3D maps</span><p>Combines sky position with spectral redshift to build cosmic volumes</p></div>
+      </div>
+    </section>
+
+    <section id="science" class="panel">
+      <div class="section-head">
+        <p class="eyebrow">Science goals</p>
+        <h2>What TIME will answer</h2>
+      </div>
+      <div class="grid two">
+        <div class="card">
+          <h3>When did stars light up?</h3>
+          <p>Trace how quickly star formation rose after the Big Bang and how metals enriched the interstellar medium.</p>
+        </div>
+        <div class="card">
+          <h3>How did structure grow?</h3>
+          <p>Compare intensity maps to simulations to understand how gas, dust, and dark matter evolved together during reionization.</p>
+        </div>
+        <div class="card">
+          <h3>Synergy with observatories</h3>
+          <p>TIME’s wide-field maps complement JWST and ALMA deep views, linking detailed galaxies to large-scale environments.</p>
+        </div>
+        <div class="card">
+          <h3>Secondary science</h3>
+          <p>Measurements can constrain the Sunyaev–Zel’dovich effect in galaxy clusters and probe interstellar medium physics.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="how-to" class="panel muted">
+      <div class="section-head">
+        <p class="eyebrow">Field notes</p>
+        <h2>Using TIME in practice</h2>
+      </div>
+      <div class="grid two">
+        <div class="card">
+          <h3>Observe with confidence</h3>
+          <p>Walk through calibration, focusing, and scan strategies on the ARO 12-m telescope.</p>
+          <a class="btn link" href="how-to.html">Open the how-to page →</a>
+        </div>
+        <div class="card">
+          <h3>Care for the cryostat</h3>
+          <p>Learn cooldown timelines, vacuum checks, and detector readout best practices before an observing run.</p>
+          <a class="btn link" href="how-to.html#cryostat">Jump to cryostat tips →</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel contact">
+      <div class="section-head">
+        <p class="eyebrow">Get involved</p>
+        <h2>Talks, data releases, and outreach</h2>
+      </div>
+      <div class="grid two">
+        <div class="card">
+          <h3>Outreach & classroom</h3>
+          <p>We share visuals, lesson starters, and Q&A sessions for classrooms and public events. Reach out to collaborate on materials tailored to your audience.</p>
+        </div>
+        <div class="card">
+          <h3>Follow the project</h3>
+          <p>Watch for engineering updates, commissioning milestones, and early science highlights as TIME maps the high-redshift universe.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="logos-row">
+    <div class="logo-card">
+      <img src="images/collaborator_logos/UniversityofArizona.jpg" alt="UniversityofArizona" class="logo">
+    </div>
+    <div class="logo-card">
+      <img src="images/collaborator_logos/CalTech.jpg" alt="Caltech" class="logo">
+    </div>
+    <div class="logo-card">
+      <img src="images/collaborator_logos/JPL.jpg" alt="JPL" class="logo">
+    </div>
+    <div class="logo-card">
+      <img src="images/collaborator_logos/NSF.jpg" alt="NSF" class="logo">
+    </div>
+    <div class="logo-card">
+      <img src="images/collaborator_logos/Cornell.jpg" alt="Cornell" class="logo">
+    </div>
+    <div class="logo-card">
+      <img src="images/collaborator_logos/ASIAA.jpg" alt="ASIAA" class="logo">
+    </div>
+    <div class="logo-card">
+      <img src="images/collaborator_logos/RIT.jpg" alt="RIT" class="logo">
+    </div>
+    <div class="logo-card">
+      <img src="images/collaborator_logos/UniversityofToronto.jpg" alt="University of Toronto" class="logo">
+    </div>
+  </div>
 </body>
 </html>

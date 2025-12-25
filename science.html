@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TIME | Science</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <header class="nav-shell">
+    <a href="index.html"><img src="images/TIME_logo.png" alt="TIME" class="brand-logo"></a>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="science.html">Science</a>
+      <a href="how-to.html">How To</a>
+      <a href="team.html">Team</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="panel hero" id="overview">
+      <div class="hero__text">
+        <p class="eyebrow">Instrument details</p>
+        <h1>The TIME Spectrometer</h1>
+        <p class="lede">A cryogenic millimeter-wave instrument designed for intensity mapping of [C II] emission from the early universe.</p>
+        <div class="actions">
+          <a class="btn primary" href="#spectrometer">Explore the spectrometer</a>
+          <a class="btn ghost" href="#detectors">Learn about detectors</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="spectrometer" class="panel">
+      <div class="section-head">
+        <p class="eyebrow">Core technology</p>
+        <h2>Grating Spectrometer</h2>
+      </div>
+      <div class="grid two">
+        <div class="card">
+          <h3>Diffraction gratings</h3>
+          <p>TIME employs reflective diffraction gratings to disperse incoming millimeter-wave radiation into spectral channels. This allows simultaneous measurement of the [C II] line across a wide redshift range.</p>
+        </div>
+        <div class="card">
+          <h3>Frequency coverage</h3>
+          <p>The spectrometer covers frequencies from ~200-400 GHz, corresponding to [C II] redshifts from z ≈ 5 to z ≈ 9. This range targets the epoch of reionization and cosmic dawn.</p>
+        </div>
+        <div class="card">
+          <h3>Resolution</h3>
+          <p>With spectral resolution R ≈ 100-300, TIME can resolve individual [C II] lines while maintaining the wide field of view needed for intensity mapping.</p>
+        </div>
+        <div class="card">
+          <h3>Optical design</h3>
+          <p>The instrument uses a compact, cryogenic optical design with off-axis mirrors and filters to minimize thermal emission and maximize throughput.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="detectors" class="panel muted">
+      <div class="section-head">
+        <p class="eyebrow">Detection</p>
+        <h2>Transition Edge Sensors</h2>
+      </div>
+      <div class="grid two">
+        <div class="card">
+          <h3>TES arrays</h3>
+          <p>Superconducting transition edge sensors operate at ~0.3 K, providing high sensitivity and low noise. TIME uses multiplexed TES arrays with thousands of pixels.</p>
+        </div>
+        <div class="card">
+          <h3>Time-domain multiplexing</h3>
+          <p>Detectors are read out using superconducting quantum interference devices (SQUIDs) in a time-domain multiplexing scheme, allowing efficient readout of large arrays.</p>
+        </div>
+        <div class="card">
+          <h3>Background-limited performance</h3>
+          <p>TES detectors achieve photon-noise-limited sensitivity, essential for detecting the faint [C II] signal against atmospheric and instrumental backgrounds.</p>
+        </div>
+        <div class="card">
+          <h3>Cryogenic cooling</h3>
+          <p>A dilution refrigerator provides the ultra-low temperatures required, with multiple stages cooling optics, filters, and detectors to minimize thermal noise.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="telescope" class="panel">
+      <div class="section-head">
+        <p class="eyebrow">Platform</p>
+        <h2>ARO 12-meter Telescope</h2>
+      </div>
+      <div class="grid two">
+        <div class="card">
+          <h3>Telescope specifications</h3>
+          <p>The Arizona Radio Observatory's 12-meter millimeter-wave telescope has a surface accuracy of ~20 μm RMS, providing excellent beam quality at high frequencies.</p>
+        </div>
+        <div class="card">
+          <h3>Location</h3>
+          <p>Located at Kitt Peak, Arizona, at 1,900 meters elevation, the site offers good atmospheric transmission in the millimeter band with PWV typically < 3 mm.</p>
+        </div>
+        <div class="card">
+          <h3>Mapping strategy</h3>
+          <p>TIME will perform drift scans and raster mapping to cover large sky areas, building 3D tomographic maps of [C II] intensity.</p>
+        </div>
+        <div class="card">
+          <h3>Integration time</h3>
+          <p>Typical integrations of 10-100 hours per field will achieve the sensitivity needed to detect the integrated [C II] signal from high-redshift galaxies.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="performance" class="panel muted">
+      <div class="section-head">
+        <p class="eyebrow">Capabilities</p>
+        <h2>Expected Performance</h2>
+      </div>
+      <div class="grid two">
+        <div class="card">
+          <h3>Sensitivity</h3>
+          <p>TIME aims for a noise equivalent flux density (NEFD) of ~10-20 Jy/√Hz, enabling detection of [C II] intensities as low as 0.1 Jy/sr.</p>
+        </div>
+        <div class="card">
+          <h3>Field of view</h3>
+          <p>The instrument has a field of view of ~1-2 degrees, allowing efficient mapping of large cosmological volumes.</p>
+        </div>
+        <div class="card">
+          <h3>System temperature</h3>
+          <p>With cryogenic cooling, the system temperature is dominated by atmospheric emission, achieving T_sys ≈ 50-100 K across the band.</p>
+        </div>
+        <div class="card">
+          <h3>Calibration</h3>
+          <p>Regular observations of calibrators (planets, bright quasars) and sky dips will ensure accurate flux calibration and atmospheric opacity monitoring.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>TIME — Instrument science • Millimeter-wave spectroscopy for cosmology</p>
+    <div class="footer-links">
+      <a href="index.html">Home</a>
+      <a href="science.html">Science</a>
+      <a href="how-to.html">How To</a>
+      <a href="team.html">Team</a>
+    </div>
+  </footer>
+</body>
+</html>
