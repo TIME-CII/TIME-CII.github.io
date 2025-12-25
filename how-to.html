@@ -18,178 +18,90 @@
     </nav>
   </header>
 
-  <main>
+  <main class="how-to-page">
     <section class="panel hero" id="overview">
       <div class="hero__text">
-        <p class="eyebrow">Field reference</p>
-        <h1>How to operate TIME</h1>
-        <p class="lede">A quick-start field guide for new observers and visiting students. Always follow site-specific safety policies and your shift lead’s direction.</p>
+        <p class="eyebrow">Instrument guides</p>
+        <h1>How to use TIME devices</h1>
+        <p class="lede">Guides for operating key instruments and devices used in the TIME experiment.</p>
         <div class="actions">
-          <a class="btn primary" href="#observing">Go to observing checklist</a>
+          <a class="btn ghost" href="#faro">Learn about FARO</a>
           <a class="btn ghost" href="index.html">Back to outreach site</a>
         </div>
       </div>
-      <div class="hero__card">
-        <p class="label">Session prep</p>
-        <ul>
-          <li>Verify weather, precipitable water vapor (PWV), and wind limits</li>
-          <li>Confirm cryostat base temperature and vacuum levels</li>
-          <li>Sync telescope ephemerides and time servers</li>
-          <li>Load nightly scan script templates and calibrators</li>
-        </ul>
-      </div>
     </section>
 
-    <section id="observing" class="panel">
+    <section id="faro" class="panel">
       <div class="section-head">
-        <p class="eyebrow">Observing run</p>
-        <h2>Standard observing checklist</h2>
+        <p class="eyebrow">Measurement</p>
+        <h2>What is a FARO and how to use it</h2>
       </div>
       <div class="grid two">
         <div class="card">
-          <h3>Before sunset</h3>
-          <ol>
-            <li>Inspect telescope drives and weather stow interlocks.</li>
-            <li>Confirm cryostat temperatures are stable and <em>dT</em> is within spec.</li>
-            <li>Check KID tuning file is current; reload if the sky background changed.</li>
-            <li>Run quick pointing check on a bright quasar; update offsets.</li>
-          </ol>
+          <h3>What is FARO?</h3>
+          <p>FARO is a coordinate measuring machine used for precise 3D scanning and alignment of optical components in TIME.</p>
         </div>
         <div class="card">
-          <h3>Startup & calibration</h3>
-          <ol>
-            <li>Warm up readout chain; verify LO lock and synth references.</li>
-            <li>Perform noise diode or sky-dip to track atmospheric opacity.</li>
-            <li>Take a short calibrator scan (planet or bright line source).</li>
-            <li>Save metadata: date, operator, weather, tuning version, scan script.</li>
-          </ol>
-        </div>
-        <div class="card">
-          <h3>During scans</h3>
-          <ol>
-            <li>Monitor telescope tracking errors and wind shake.</li>
-            <li>Watch detector load curves and gain; retune if gain drifts.</li>
-            <li>Log anomalies (dropouts, RFI spikes, clouds) with UTC timestamps.</li>
-            <li>Alternate science scans with short calibrator hits every 60–90 min.</li>
-          </ol>
-        </div>
-        <div class="card">
-          <h3>Shutdown</h3>
-          <ol>
-            <li>Stow telescope if winds exceed limits or at end of shift.</li>
-            <li>Stop data acquisition; back up raw data to on-site storage.</li>
-            <li>Export run summary: pointing offsets, opacity, system temperature.</li>
-            <li>Leave readout warm or cold per shift-lead instructions.</li>
-          </ol>
+          <h3>How to use it</h3>
+          <p>Power on the FARO arm, calibrate the base, and scan surfaces by moving the probe tip along the object for accurate measurements.</p>
         </div>
       </div>
     </section>
 
-    <section id="cryostat" class="panel muted">
+    <section id="squid" class="panel muted">
       <div class="section-head">
-        <p class="eyebrow">Cryogenic system</p>
-        <h2>Cryostat care and cooldown</h2>
+        <p class="eyebrow">Detection</p>
+        <h2>What is a SQUID and how to tune it</h2>
       </div>
       <div class="grid two">
         <div class="card">
-          <h3>Cooldown outline</h3>
-          <ol>
-            <li>Pump to high vacuum (< 1e-5 mbar) with turbopump; confirm leak checks.</li>
-            <li>Start pulse-tube cooler; monitor temperature plateaus and vibration.</li>
-            <li>Engage sub-K stage (e.g., sorption or dilution) once 4 K is stable.</li>
-            <li>Record base temperatures of each stage and detector array.</li>
-          </ol>
+          <h3>What is SQUID?</h3>
+          <p>SQUID stands for Superconducting Quantum Interference Device, used for ultra-sensitive magnetic field detection in TIME's readout system.</p>
         </div>
         <div class="card">
-          <h3>Health checks</h3>
-          <ul>
-            <li>Pressure rise < 5e-6 mbar/hr after isolation indicates tight seals.</li>
-            <li>Vibration sensors within limits to avoid pointing jitter.</li>
-            <li>Temperature drifts < 10 mK over 10 minutes before observing.</li>
-            <li>Spare getters and O-rings stocked before long campaigns.</li>
-          </ul>
+          <h3>How to tune it</h3>
+          <p>Adjust the bias current and feedback parameters to operate the SQUID in its linear response region for optimal signal amplification.</p>
         </div>
       </div>
     </section>
 
-    <section id="spectrometer" class="panel">
+    <section id="calibration" class="panel">
       <div class="section-head">
-        <p class="eyebrow">Spectrometers</p>
-        <h2>Grating spectrometer quick notes</h2>
+        <p class="eyebrow">Data processing</p>
+        <h2>How to calibrate data using a planet</h2>
       </div>
       <div class="grid two">
         <div class="card">
-          <h3>Alignment</h3>
-          <ul>
-            <li>Verify feedhorn and slit alignment with near-field source before run.</li>
-            <li>Check grating angle encoders; ensure home position is registered.</li>
-            <li>Run a spectral line source to map channel spacing and band edges.</li>
-          </ul>
+          <h3>Why planets?</h3>
+          <p>Planets provide bright, stable sources for flux calibration in millimeter-wave astronomy.</p>
         </div>
         <div class="card">
-          <h3>Throughput tips</h3>
-          <ul>
-            <li>Keep optics covers closed until the dome is dust-free.</li>
-            <li>Re-seat and torque waveguide connections during maintenance.</li>
-            <li>Log any polarization-dependent response when using calibrators.</li>
-          </ul>
+          <h3>How to calibrate</h3>
+          <p>Observe a planet like Jupiter, measure its flux, and scale your data to match known planetary models for accurate calibration.</p>
         </div>
       </div>
     </section>
 
-    <section id="readout" class="panel muted">
+    <section id="icecream" class="panel muted">
       <div class="section-head">
-        <p class="eyebrow">Detectors</p>
-        <h2>TES readout checklist</h2>
+        <p class="eyebrow">Fun experiment</p>
+        <h2>How to make liquid nitrogen ice cream</h2>
       </div>
       <div class="grid two">
         <div class="card">
-          <h3>Tuning</h3>
-          <ul>
-            <li>Load bias map; flag unstable pixels before on-sky scans.</li>
-            <li>Set TES bias to keep detectors at the superconducting transition.</li>
-            <li>Retune after large PWV changes or sunrise heating.</li>
-          </ul>
+          <h3>How to fill liquid nitrogen</h3>
+          <p>Use a transfer hose to safely fill the dewar with liquid nitrogen from the supply tank, ensuring proper venting and avoiding overfilling.</p>
         </div>
         <div class="card">
-          <h3>Data quality</h3>
-          <ul>
-            <li>Track system temperature ($T_\mathrm{sys}$) and gain stability.</li>
-            <li>Remove cosmic-ray spikes and radio-frequency interference in QA.</li>
-            <li>Cross-check detector noise PSDs against reference curves.</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <section id="safety" class="panel">
-      <div class="section-head">
-        <p class="eyebrow">Safety & etiquette</p>
-        <h2>Stay safe on site</h2>
-      </div>
-      <div class="grid two">
-        <div class="card">
-          <h3>People first</h3>
-          <ul>
-            <li>Follow ARO site safety briefings; log entries and exits.</li>
-            <li>Use harnesses and two-person rule for elevated platforms.</li>
-            <li>Wear hearing protection near compressors and pumps.</li>
-          </ul>
-        </div>
-        <div class="card">
-          <h3>Equipment care</h3>
-          <ul>
-            <li>Lock out power before servicing drives or cryo hardware.</li>
-            <li>Use clean-room gloves for optics; keep desiccant dry packs fresh.</li>
-            <li>Do not leave cryostat warm unattended; schedule with leads.</li>
-          </ul>
+          <h3>How to make ice cream</h3>
+          <p>With the remaining liquid nitrogen, slowly pour it into a mixture of cream, sugar, and flavors while stirring to create instant ice cream.</p>
         </div>
       </div>
     </section>
   </main>
 
   <footer>
-    <p>TIME — Field reference for observers • For full project story, return to the outreach site.</p>
+    <p>TIME — Instrument guides • For full project story, return to the outreach site.</p>
     <div class="footer-links">
       <a href="index.html">Home</a>
       <a href="science.html">Science</a>

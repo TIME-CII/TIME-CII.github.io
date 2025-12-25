@@ -167,6 +167,10 @@ main {
   margin-top: 6px;
 }
 
+.section-head {
+  text-align: center;
+}
+
 .eyebrow {
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -271,6 +275,11 @@ main {
   color: var(--dusk);
 }
 
+.btn.ghost:hover {
+  background: radial-gradient(circle at 20% 20%, rgb(186, 215, 205), rgb(192, 182, 231));
+  color: var(--ink);
+}
+
 .btn.link {
   border: none;
   padding: 0;
@@ -307,6 +316,7 @@ footer {
   gap: 10px;
   flex-wrap: wrap;
   width: 100%;
+  margin-top: 80px;
 }
 
 .logo-card {
@@ -385,4 +395,59 @@ footer {
     height: 50px;
     margin-top: 3px;
   }
+}
+
+/* Publications section width */
+#papers {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* How-to page post-it notes */
+.how-to-page .card {
+  background: #fff1b8;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  position: relative;
+  transform: rotate(-1deg);
+  transition: transform 0.3s ease;
+  overflow: visible;
+}
+
+.how-to-page .card:nth-child(odd) {
+  transform: rotate(1deg);
+}
+
+.how-to-page .card:nth-child(3n) {
+  transform: rotate(-0.5deg);
+}
+
+.how-to-page .card:hover {
+  transform: rotate(5deg) scale(1.05);
+  z-index: 10;
+}
+
+.how-to-page .card::before {
+  content: '';
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 24px;
+  background: #374151;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.how-to-page .card::after {
+  content: '';
+  position: absolute;
+  top: -7px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 19px;
+  background: #6b7280;
+  border-radius: 2px;
 }
