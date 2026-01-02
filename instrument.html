@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TIME | Science</title>
+  <title>TIME | Instrument</title>
   <link rel="stylesheet" href="style.css">
   <script src="script.js" defer></script>
 </head>
@@ -12,7 +12,7 @@
     <a href="index.html"><img src="images/TIME_logo.png" alt="TIME" class="brand-logo"></a>
     <nav>
       <a href="index.html">Home</a>
-      <a href="science.html">Science</a>
+      <a href="instrument.html">Instrument</a>
       <a href="status.html">Status</a>
       <a href="how-to.html">How To</a>
       <a href="team.html">Team</a>
@@ -38,6 +38,12 @@
         <p class="eyebrow">Core technology</p>
         <h2>Grating Spectrometer</h2>
       </div>
+      <div class="spectrometer-container" style="background: white; padding: 20px; text-align: center; border-radius: 10px; margin-top: 20px;">
+        <div class="spectrometer-images" style="display: flex; justify-content: center; align-items: center; gap: 10px;">
+          <img src="images/spectrometer1.png" alt="Spectrometer 1">
+          <img src="images/spectrometer2.png" alt="Spectrometer 2">
+        </div>
+      </div>
       <div class="grid two">
         <div class="card">
           <h3>Diffraction gratings</h3>
@@ -45,11 +51,11 @@
         </div>
         <div class="card">
           <h3>Frequency coverage</h3>
-          <p>The spectrometer covers frequencies from ~200-400 GHz, corresponding to [CII] redshifts from z ≈ 5 to z ≈ 9. This range targets the epoch of reionization and cosmic dawn.</p>
+          <p>The spectrometer covers frequencies from ~ 180 - 320 GHz, corresponding to [CII] redshifts from z ≈ 5 to z ≈ 9. This range targets the epoch of reionization and cosmic dawn.</p>
         </div>
         <div class="card">
           <h3>Resolution</h3>
-          <p>With spectral resolution R ≈ 100-300, TIME can resolve individual [CII] lines while maintaining the wide field of view needed for intensity mapping.</p>
+          <p>With spectral resolution R ≈ 100, TIME can resolve individual [CII] lines while maintaining the wide field of view needed for intensity mapping.</p>
         </div>
         <div class="card">
           <h3>Optical design</h3>
@@ -60,17 +66,17 @@
 
     <section id="detectors" class="panel muted">
       <div class="section-head">
-        <p class="eyebrow">Detection</p>
-        <h2>Transition Edge Sensors</h2>
+        <p class="eyebrow">Detectors</p>
+        <h2>Transition Edge Sensor Bolometers</h2>
       </div>
       <div class="grid two">
         <div class="card">
           <h3>TES arrays</h3>
-          <p>Superconducting transition edge sensors operate at ~0.3 K, providing high sensitivity and low noise. TIME uses multiplexed TES arrays with thousands of pixels.</p>
+          <p>TES bolometers are superconducting thermistors operated at the sharp transition between the superconducting and normal states, typically at temperatures of ~0.3 K. Incoming mm-wave radiation is absorbed and converted into heat, producing a small change in temperature that leads to a measurable change in electrical resistance. TIME employs large, multiplexed arrays of TES bolometers comprising thousands of pixels.</p>
         </div>
         <div class="card">
           <h3>Time-domain multiplexing</h3>
-          <p>Detectors are read out using superconducting quantum interference devices (SQUIDs) in a time-domain multiplexing scheme, allowing efficient readout of large arrays.</p>
+          <p>Detectors are read out using superconducting quantum interference devices (SQUIDs) in a time-domain multiplexing (TDM) scheme, in which signals from multiple detectors are sequentially sampled in time. Compared to frequency-domain multiplexing (FDM), TDM reduces readout complexity and wiring while maintaining low noise, enabling efficient readout of large TES arrays.</p>
         </div>
         <div class="card">
           <h3>Background-limited performance</h3>
