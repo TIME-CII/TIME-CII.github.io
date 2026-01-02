@@ -491,6 +491,14 @@ footer {
     padding: 22px;
   }
 
+  .grid.two {
+    grid-template-columns: 1fr;
+  }
+
+  .grid.three {
+    grid-template-columns: 1fr;
+  }
+
   .logo-card {
     width: 80px;
     height: 80px;
@@ -556,4 +564,29 @@ footer {
   height: 19px;
   background: #6b7280;
   border-radius: 2px;
+}
+
+/* Spectrometer images container */
+.spectrometer-container {
+  margin-top: 20px;
+}
+
+.spectrometer-images {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.spectrometer-images img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+@media (max-width: 600px) {
+  .spectrometer-images {
+    flex-direction: column;
+    gap: 15px;
+  }
 }
