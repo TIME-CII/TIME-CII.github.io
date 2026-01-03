@@ -67,9 +67,14 @@ nav {
   gap: 18px;
 }
 
-nav a {
-  margin-left: 18px;
-  font-weight: 600;
+nav a.current {
+  font-weight: 700;
+  color: var(--dusk);
+}
+
+nav a:hover {
+  font-weight: 700;
+  text-decoration: none;
 }
 
 main {
@@ -365,7 +370,6 @@ main {
 .paper-item p a {
   color: var(--ink);
   text-decoration: none;
-  font-weight: 600;
   border-bottom: 1px solid transparent;
   transition: border-color 0.2s ease;
 }
