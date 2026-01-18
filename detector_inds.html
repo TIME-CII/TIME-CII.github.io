@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TIME | Detectors</title>
+<link rel="stylesheet" href="style.css" />
+<script src="script.js" defer></script>
+
+<style>
+  :root{--cell: 15px;--gap: 2px;--ylabel: 28px;--ycol: 46px;--xaxis: 28px;--xlabel: 22px;}
+  body { margin: 0; overflow-x: hidden; }
+  main { max-width: none !important;  overflow: visible; }
+  footer { max-width: none !important; }
+
+  .panel, .grid-card, .grid-wrap,#detgrid_xf, #detgrid_cr { overflow: visible !important; }
+
+  .panel{display: grid;grid-template-rows: auto auto auto; gap: 10px;padding: 0 10px;}
+  
+  .det-controls{display: flex;justify-content: center;gap: 12px ;flex-wrap: wrap;align-items: center;}
+  .det-controls select{padding: 8px 10px;border-radius: 10px;border: 3px solid rgba(0,0,0,0.12);background: white;font-size: 1rem;}
+  
+  .grid-card{border-radius: 18px;
+    border:1px solid rgba(0,0,0,0.08);
+    background:rgba(255,255,255,0.9);
+    padding:12px;
+    width:fit-content;
+    margin:0 auto;
+    position:relative;}
+
+  .card-title{text-align: center;font-family: 'Roboto', sans-serif;font-weight:700;margin:2px 0 4px;opacity: 0.9;}
+  .card-subtitle{text-align: center;font-size: 0.9rem;opacity:0.75; margin: 0 0 10px; }
+
+  .grid-wrap{display: grid;
+    grid-template-columns: var(--ylabel) var(--ycol) auto;
+    grid-template-rows:auto var(--xaxis) var(--xlabel);
+    gap:8px 10px;
+    align-items:start;
+    justify-items:start;
+    position: relative; }
+
+  .y-axis-label{grid-column: 1;
+    grid-row:1;
+    writing-mode:vertical-rl;
+    transform:rotate(180deg);
+    font-size:13px;
+    opacity:0.85;
+    align-self: center;
+    justify-self:center;}
+  .x-axis-label{grid-column: 3;
+    grid-row:3;
+    justify-self:center;
+    font-size:13px;
+    opacity:0.85; }
+
+  /*focal plan*/
+  #yaxis_xf{grid-column: 2; grid-row: 1;
+    display: grid;
+    grid-template-rows: repeat(16, var(--cell));
+    gap: var(--gap);
+    justify-items: end;
+    align-items: center;
+    font-size: 12px;
+    color:#444;
+    line-height: 1;}
+  #xaxis_xf{grid-column: 3; grid-row: 2;
+    display: grid;
+    grid-template-columns: repeat(60, var(--cell));
+    gap: var(--gap);
+    font-size:12px;
+    color:#444;
+    line-height: 1;}
+
+  
+
+  #detgrid_xf{grid-column: 3; grid-row: 1;
+    display: grid;
+    grid-template-columns: repeat(60, var(--cell));
+    grid-auto-rows: var(--cell);
+    gap: var(--gap);
+    position: relative;}
+
+  /*cr grid*/
+  #yaxis_cr{grid-column: 2; grid-row: 1;
+    display: grid;
+    grid-template-rows:repeat(33, var(--cell));
+    gap: var(--gap);
+    justify-items:end;
+    align-items:center;
+    font-size: 12px;
+    color: #444;
+    line-height: 1; }
+  #xaxis_cr{grid-column: 3; grid-row: 2;
+    display: grid;
+    grid-template-columns: repeat(32, var(--cell));
+    gap:var(--gap);
+    font-size: 12px;
+    color:#444;
+    line-height: 1;}
+  #detgrid_cr{grid-column: 3; grid-row: 1;
+    display:grid;
+    grid-template-columns: repeat(32, var(--cell));
+    grid-auto-rows:var(--cell);
+    gap: var(--gap);
+    position: relative;}
+
+  .det-cell{width: var(--cell);
+    height: var(--cell);
+    border:0;padding:0;
+    border-radius:4px;
+    cursor:pointer;
+    position:relative;}
+  .det-cell:hover{outline: 5px solid rgba(0,0,0,0.35);}
+  /*only make it once to reduce lag  */
+
+  #globalTooltip{position: fixed;
+    left: 0;
+    top: 0;
+    transform: translate(-9999px, -9999px);
+    background: rgba(0,0,0,0.93);
+    color: #fff;
+    padding: 12px 14px;
+    border-radius: 12px;
+    font-size: 16px;
+    line-height: 1.35;
+    white-space: pre;
+    z-index: 999999999; /*lol cuz i can */         
+    will-change: transform;   
+    display: none;}  /* hide that box if not hovering*/
+</style>
+</head>
+<body>
+<header class="nav-shell">
+  <a href="index.html"><img src="images/TIME_logo.png" alt="TIME" class="brand-logo"></a>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="instrument.html">Instrument</a>
+    <a href="status.html">Status</a>
+    <a href="how-to.html">How To</a>
+    <a href="team.html">Team</a>
+    <a href="detector_inds.html" class="current">TIME Tools</a>
+  </nav>
+</header>
+<main>
+
+  <!-- part 1: (x,f) -->
+  <section class="panel">
+    <div style="text-align:center;">
+      <h2 style="margin: 0 0 6px;">(x, f) focal-plane mapping</h2>
+      <p style="margin: 0; opacity: 0.8;">Coloored by MUX column. Hover: x,f -> c,r. x=0 bottom -> 15 top. f=0 -> 59.</p>
+    </div>
+
+    <div class="det-controls">
+      <label for="which_mce"><b>MCE:</b></label>
+      <select id="which_mce">
+        <option value="mce0">MCE0 - Spec A</option>
+        <option value="mce1">MCE1 - Spec B</option>
+      </select>
+      <span id="status_txt" style="opacity:0.75; font-size:0.95rem;">Loading maps…</span>
+    </div>
+
+    <div class="grid-card">
+      <div class="card-title">(x, f) focal plane</div>
+      <div class="grid-wrap">
+        <div class="y-axis-label">x</div>
+        <div id="yaxis_xf"></div>
+        <div id="detgrid_xf"></div>
+        <div id="xaxis_xf"></div>
+        <div class="x-axis-label">f</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- pat 2: (c,r) -->
+  <section class="panel">
+    <div style="text-align:center;">
+      <h2 style="margin: 0 0 6px;">(c, r) MUX mapping</h2>
+      <p style="margin: 0; opacity: 0.8;"> Colored by MUXcolumn. Hover: c,r -> x,f. c=0 -> 31. r=0 bottom -> 32 top.</p>
+    </div>
+
+    <div class="grid-card">
+      <div class="card-title">(c, r) MUX grid</div>
+      
+
+
+
+      <div class="grid-wrap">
+        <div class="y-axis-label">r</div>
+        <div id="yaxis_cr"></div>
+
+        <div id="detgrid_cr"></div>
+
+        <div id="xaxis_cr"></div>
+        <div class="x-axis-label">c</div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <p>TIME collaboration • Tomographic Ionized-carbon Mapping Experiment</p>
+</footer>
+
+<div id="globalTooltip"></div>
+
+<script>
+  const NX = 16, NF = 60;
+  const NC = 32, NR = 33;
+  const which_mce= document.getElementById("which_mce");
+  const status_txt =document.getElementById("status_txt");
+
+  const detgrid_xf= document.getElementById("detgrid_xf");
+  const yaxis_xf =document.getElementById("yaxis_xf");
+  const xaxis_xf=document.getElementById("xaxis_xf");
+  const detgrid_cr = document.getElementById("detgrid_cr");
+  const yaxis_cr = document.getElementById("yaxis_cr");
+  const xaxis_cr= document.getElementById("xaxis_cr");
+
+  //make a box that shows the detector indeces
+  const tooltip = document.getElementById("globalTooltip");
+
+  // plt tab20c and then some from tab20b lol i couldn't find the one jon used for the proper chronos
+  const colors32 = [
+    "#3182bd","#6baed6","#9ecae1","#c6dbef",
+    "#e6550d","#fd8d3c","#fdae6b","#fdd0a2",
+    "#31a354","#74c476","#a1d99b","#c7e9c0",
+    "#756bb1","#9e9ac8","#bcbddc","#dadaeb",
+    "#636363","#969696","#bdbdbd","#d9d9d9",
+    "#8c6d31","#bd9e39","#e7ba52","#e7cb94",
+    "#843c39","#ad494a","#d6616b","#e7969c",
+    "#7b4173","#a55194","#ce6dbd","#de9ed6"];
+
+  function color_column(c){return colors32[c%32];}
+
+  //we store mappings as flat arrays so that the website doesn't have to load info about individual detectors
+  //xf: idx = x*NF+f (x in range(16), f in range(60))
+  //cr: idx = r*NC+c (r in range(33), c in range(32))
+
+  const maps={mce0: { xf: null, cr: null },mce1: { xf: null, cr: null }};
+  function xf_index(x,f){ return x*NF + f; }
+  function cr_index(c,r){ return r*NC + c; }
+
+  // idk what this does but it was laggy and chatgpt say to do this lol
+  let last_mouse = null;
+  let rafPending = false;
+
+  function show_info(text){tooltip.textContent = text;tooltip.style.display = "block";}
+  function hide_info(){
+    tooltip.style.display = "none";
+    tooltip.style.transform = "translate(-9999px, -9999px)";
+    last_mouse=null;
+    rafPending=false;
+  }
+  function queue_info_move(e){
+    last_mouse = e;
+    if (rafPending) return;
+    rafPending = true;
+
+    requestAnimationFrame(() => {
+      rafPending = false;
+      if (!last_mouse || tooltip.style.display === "none") return;
+
+      const pad=12;
+      const offset = 14;
+
+      const rect = tooltip.getBoundingClientRect();
+      let x= last_mouse.clientX - rect.width / 2;
+      let y= last_mouse.clientY - rect.height - offset;
+      x= Math.max(pad, Math.min(x, window.innerWidth  - rect.width  - pad));
+      y= Math.max(pad, Math.min(y, window.innerHeight - rect.height - pad));
+
+      tooltip.style.transform = `translate(${x}px, ${y}px)`;
+    });
+  }
+
+  function make_axes(){
+    yaxis_xf.innerHTML = "";
+    for (let x = NX - 1; x >= 0; x--){
+      const d = document.createElement("div");
+      d.textContent = x;
+      yaxis_xf.appendChild(d);}
+    xaxis_xf.innerHTML = "";
+    for (let f = 0; f < NF; f++){
+      const d = document.createElement("div");
+      d.textContent =(f%5 === 0) ? f : "";
+      xaxis_xf.appendChild(d);}
+    yaxis_cr.innerHTML = "";
+    for (let r = NR - 1; r >= 0; r--){
+      const d = document.createElement("div");
+      d.textContent = r;
+      yaxis_cr.appendChild(d);}
+    xaxis_cr.innerHTML = "";
+    for (let c = 0; c < NC; c++){
+      const d = document.createElement("div");
+      d.textContent =(c%4 === 0) ? c : "";
+      xaxis_cr.appendChild(d);}
+  }
+
+  //build grids
+  function make_xfgrid(){
+    detgrid_xf.innerHTML = "";
+    const which =which_mce.value;
+    const xf=maps[which].xf;
+    const frag= document.createDocumentFragment();
+    // order is x=15 top 
+    for (let x = NX - 1; x >= 0; x--){
+      for (let f = 0; f < NF; f++){
+        const idx = xf_index(x,f);
+        const rec = xf[idx];
+        const cell = document.createElement("button");
+        cell.className = "det-cell";
+        cell.type = "button";
+
+        if (rec) cell.style.background = color_column(rec.c);
+
+        //store indices for hover 
+        cell.dataset.x = x;
+        cell.dataset.f = f;
+
+        frag.appendChild(cell);
+      }
+    }
+    detgrid_xf.appendChild(frag);
+  }
+
+  function make_crgrid(){
+    detgrid_cr.innerHTML = "";
+    const frag= document.createDocumentFragment();
+    //order is r=32 at the top 
+    for (let r =NR - 1; r>= 0; r--){
+      for (let c =0; c< NC; c++){
+        const cell = document.createElement("button");
+        cell.className = "det-cell";
+        cell.type = "button";
+
+        //color by c
+        cell.style.background = color_column(c);
+        cell.dataset.c=c;
+        cell.dataset.r=r;
+        frag.appendChild(cell);
+      }
+    }
+    detgrid_cr.appendChild(frag);
+  }
+
+  function rebuild_xfcr_grid(){hide_info();make_xfgrid();make_crgrid();}
+
+  //hover for xf grid
+  detgrid_xf.addEventListener("mousemove", (e) => {
+    const t = e.target;
+    if (!(t instanceof HTMLElement)) return;
+    if (!t.classList.contains("det-cell")) return;
+
+    const which = which_mce.value;
+    const xf = maps[which].xf;
+    const x = Number(t.dataset.x);
+    const f = Number(t.dataset.f);
+    const rec = xf[xf_index(x,f)];
+    const c = rec ? rec.c : "NA";
+    const r = rec ? rec.r : "NA";
+
+    show_info(`${which.toUpperCase()}\n` +`x = ${x}   f = ${f}\n` +`c = ${c}   r = ${r}`);
+    queue_info_move(e);
+  });
+
+  detgrid_xf.addEventListener("mouseleave", hide_info);
+
+  //hover for cr
+  detgrid_cr.addEventListener("mousemove", (e) => {
+    const t = e.target;
+    if (!(t instanceof HTMLElement)) return;
+    if (!t.classList.contains("det-cell")) return;
+
+    const which = which_mce.value;
+    const cr = maps[which].cr;
+    const c= Number(t.dataset.c);
+    const r= Number(t.dataset.r);
+    const rec = cr[cr_index(c,r)];
+    const x=rec ? rec.x : "NA";
+    const f=rec ? rec.f : "NA";
+
+    show_info(`${which.toUpperCase()}\n` +`c = ${c}   r = ${r}\n` +`x = ${x}   f = ${f}`);
+    queue_info_move(e);
+  });
+
+  detgrid_cr.addEventListener("mouseleave", hide_info);
+
+  // load jsons i made from coordinates.py, under tools folder.
+  async function load_mapping(){
+    try{
+      status_txt.textContent = "Loading maps…";
+      const [m0, m1] = await Promise.all([
+        fetch("./tools/detector_map_mce0.json").then(r => {
+          if(!r.ok) throw new Error("Failed to load detector_map_mce0.json");
+          return r.json();
+        }),
+        fetch("./tools/detector_map_mce1.json").then(r => {
+          if(!r.ok) throw new Error("Failed to load detector_map_mce1.json");
+          return r.json();
+        })
+      ]);
+      //build xf
+      maps.mce0.xf = new Array(NX*NF).fill(null);
+      maps.mce1.xf = new Array(NX*NF).fill(null);
+      for (const rec of m0) maps.mce0.xf[xf_index(rec.x, rec.f)] = rec;
+      for (const rec of m1) maps.mce1.xf[xf_index(rec.x, rec.f)] = rec;
+
+      //and then also build cr from xf
+      maps.mce0.cr = new Array(NR*NC).fill(null);
+      maps.mce1.cr = new Array(NR*NC).fill(null);
+      for (const rec of maps.mce0.xf) if (rec) maps.mce0.cr[cr_index(rec.c, rec.r)] = rec;
+      for (const rec of maps.mce1.xf) if (rec) maps.mce1.cr[cr_index(rec.c, rec.r)] = rec;
+
+      make_axes();
+      rebuild_xfcr_grid();
+      status_txt.textContent = "Loaded";} catch (e){console.error(e);status_txt.textContent = "Load failed (check json paths).";}
+  }
+  which_mce.addEventListener("change", rebuild_xfcr_grid);
+  load_mapping();
+</script>
+
+</body>
+</html>
