@@ -52,6 +52,9 @@
     justify-self:center;
     font-size:13px;
     opacity:0.85; }
+  .cr-center {
+    display: flex;
+    justify-content: center;}
 
   /*focal plan*/
   #yaxis_xf{grid-column: 2; grid-row: 1;
@@ -70,8 +73,6 @@
     font-size:12px;
     color:#444;
     line-height: 1;}
-
-  
 
   #detgrid_xf{grid-column: 3; grid-row: 1;
     display: grid;
@@ -96,12 +97,14 @@
     gap:var(--gap);
     font-size: 12px;
     color:#444;
+    justify-content: center;
     line-height: 1;}
   #detgrid_cr{grid-column: 3; grid-row: 1;
     display:grid;
     grid-template-columns: repeat(32, var(--cell));
     grid-auto-rows:var(--cell);
     gap: var(--gap);
+    justify-content: center;
     position: relative;}
 
   .det-cell{width: var(--cell);
@@ -124,11 +127,12 @@
     font-size: 16px;
     line-height: 1.35;
     white-space: pre;
-    z-index: 999999999; /*lol cuz i can */         
-    will-change: transform;   
-    display: none;}  /* hide that box if not hovering*/
+    z-index: 999999999; /*lol cuz i can */       
+    will-change: transform;
+    display: none;} /* hide that box if not hovering*/
 </style>
 </head>
+
 <body>
 <header class="nav-shell">
   <a href="index.html"><img src="images/TIME_logo.png" alt="TIME" class="brand-logo"></a>
@@ -141,13 +145,17 @@
     <a href="detector_inds.html" class="current">TIME Tools</a>
   </nav>
 </header>
+
 <main>
 
-  <!-- part 1: (x,f) -->
+  <!-- now they all under the same section  -->
   <section class="panel">
+
     <div style="text-align:center;">
-      <h2 style="margin: 0 0 6px;">(x, f) focal-plane mapping</h2>
-      <p style="margin: 0; opacity: 0.8;">Coloored by MUX column. Hover: x,f -> c,r. x=0 bottom -> 15 top. f=0 -> 59.</p>
+      <h2 style="margin: 0 0 6px;">Detector mapping</h2>
+      <p style="margin: 0; opacity: 0.8;">
+        Colored by MUX column. Hover shows corresponding indices.
+      </p>
     </div>
 
     <div class="det-controls">
@@ -160,6 +168,8 @@
     </div>
 
     <div class="grid-card">
+
+      <!-- part 1: (x,f) -->
       <div class="card-title">(x, f) focal plane</div>
       <div class="grid-wrap">
         <div class="y-axis-label">x</div>
@@ -168,32 +178,26 @@
         <div id="xaxis_xf"></div>
         <div class="x-axis-label">f</div>
       </div>
-    </div>
-  </section>
 
-  <!-- pat 2: (c,r) -->
-  <section class="panel">
-    <div style="text-align:center;">
-      <h2 style="margin: 0 0 6px;">(c, r) MUX mapping</h2>
-      <p style="margin: 0; opacity: 0.8;"> Colored by MUXcolumn. Hover: c,r -> x,f. c=0 -> 31. r=0 bottom -> 32 top.</p>
-    </div>
+      <div style="height:14px;"></div>
 
-    <div class="grid-card">
+      <!-- pat 2: (c,r) -->
       <div class="card-title">(c, r) MUX grid</div>
-      
+      <div class="cr-center">
+        <div class="grid-wrap">
+          <div class="y-axis-label">r</div>
+          <div id="yaxis_cr"></div>
 
+          <div id="detgrid_cr"></div>
 
-
-      <div class="grid-wrap">
-        <div class="y-axis-label">r</div>
-        <div id="yaxis_cr"></div>
-
-        <div id="detgrid_cr"></div>
-
-        <div id="xaxis_cr"></div>
-        <div class="x-axis-label">c</div>
+          <div id="xaxis_cr"></div>
+          <div class="x-axis-label">c</div>
+        </div>
       </div>
+
+
     </div>
+
   </section>
 
 </main>
@@ -216,20 +220,14 @@
   const detgrid_cr = document.getElementById("detgrid_cr");
   const yaxis_cr = document.getElementById("yaxis_cr");
   const xaxis_cr= document.getElementById("xaxis_cr");
-
   //make a box that shows the detector indeces
   const tooltip = document.getElementById("globalTooltip");
-
-  // plt tab20c and then some from tab20b lol i couldn't find the one jon used for the proper chronos
-  const colors32 = [
-    "#3182bd","#6baed6","#9ecae1","#c6dbef",
-    "#e6550d","#fd8d3c","#fdae6b","#fdd0a2",
-    "#31a354","#74c476","#a1d99b","#c7e9c0",
-    "#756bb1","#9e9ac8","#bcbddc","#dadaeb",
-    "#636363","#969696","#bdbdbd","#d9d9d9",
-    "#8c6d31","#bd9e39","#e7ba52","#e7cb94",
-    "#843c39","#ad494a","#d6616b","#e7969c",
-    "#7b4173","#a55194","#ce6dbd","#de9ed6"];
+  // now with real color scheme that evan sent
+  const colors32 = ['#1f77b4', '#669fce', '#aec7e8', '#ff7f0e', '#ff9d43', '#ffbb78',
+    '#2ca02c', '#62c05b', '#98df8a', '#d62728', '#eb605f', '#ff9896',
+    '#9467bd', '#ac8cc9', '#c5b0d5', '#8c564b', '#a87970', '#c49c94',
+    '#e377c2', '#ed96ca', '#f7b6d2', '#7f7f7f', '#a3a3a3', '#c7c7c7',
+    '#bcbd22', '#cccc58', '#dbdb8d', '#17becf', '#5accda', '#9edae5'];
 
   function color_column(c){return colors32[c%32];}
 
@@ -311,7 +309,6 @@
         const cell = document.createElement("button");
         cell.className = "det-cell";
         cell.type = "button";
-
         if (rec) cell.style.background = color_column(rec.c);
 
         //store indices for hover 
@@ -363,7 +360,6 @@
     show_info(`${which.toUpperCase()}\n` +`x = ${x}   f = ${f}\n` +`c = ${c}   r = ${r}`);
     queue_info_move(e);
   });
-
   detgrid_xf.addEventListener("mouseleave", hide_info);
 
   //hover for cr
@@ -383,7 +379,6 @@
     show_info(`${which.toUpperCase()}\n` +`c = ${c}   r = ${r}\n` +`x = ${x}   f = ${f}`);
     queue_info_move(e);
   });
-
   detgrid_cr.addEventListener("mouseleave", hide_info);
 
   // load jsons i made from coordinates.py, under tools folder.
@@ -400,6 +395,7 @@
           return r.json();
         })
       ]);
+
       //build xf
       maps.mce0.xf = new Array(NX*NF).fill(null);
       maps.mce1.xf = new Array(NX*NF).fill(null);
@@ -414,8 +410,13 @@
 
       make_axes();
       rebuild_xfcr_grid();
-      status_txt.textContent = "Loaded";} catch (e){console.error(e);status_txt.textContent = "Load failed (check json paths).";}
+      status_txt.textContent = "Loaded";
+    } catch (e){
+      console.error(e);
+      status_txt.textContent = "Load failed (check json paths).";
+    }
   }
+
   which_mce.addEventListener("change", rebuild_xfcr_grid);
   load_mapping();
 </script>
