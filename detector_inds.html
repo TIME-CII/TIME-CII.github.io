@@ -20,6 +20,8 @@
   .det-controls{display: flex;justify-content: center;gap: 12px ;flex-wrap: wrap;align-items: center;}
   .det-controls select{padding: 8px 10px;border-radius: 10px;border: 3px solid rgba(0,0,0,0.12);background: white;font-size: 1rem;}
   
+  #toggle_mask{width: 18px;height: 18px;}
+
   .grid-card{border-radius: 18px;
     border:1px solid rgba(0,0,0,0.08);
     background:rgba(255,255,255,0.9);
@@ -130,6 +132,21 @@
     z-index: 999999999; /*lol cuz i can */       
     will-change: transform;
     display: none;} /* hide that box if not hovering*/
+
+
+  /* when mask overlay is disabled, hide the dot */
+  #detgrid_xf.no-mask .det-cell.masked::after,
+  #detgrid_cr.no-mask .det-cell.masked::after{display:none;}
+
+  /* black dot overlay for dead squids*/
+  .det-cell.masked::after{
+  content:"";
+  position:absolute;
+  inset:2px;
+  border-radius:999px;
+  background: rgba(0,0,0,0.92);
+  pointer-events:none;
+  }
 </style>
 </head>
 
@@ -154,7 +171,9 @@
     <div style="text-align:center;">
       <h2 style="margin: 0 0 6px;">Detector mapping</h2>
       <p style="margin: 0; opacity: 0.8;">
-        Colored by MUX column. Hover shows corresponding indices.
+        Colored by MUX column. Hover shows corresponding indices. <br>
+        Check the show dead squids box to show which squid is dead from the last tuning <br>
+        Note that after a tuning you will need to update the <code>tools/dead_squids.js</code> file manually 
       </p>
     </div>
 
@@ -165,6 +184,10 @@
         <option value="mce1">MCE1 - Spec B</option>
       </select>
       <span id="status_txt" style="opacity:0.75; font-size:0.95rem;">Loading maps…</span>
+
+      <label style="display:flex; align-items:center; gap:8px;font-weight:600;">
+      <input type="checkbox" id="toggle_mask">Show Dead Squids</label>
+      <span id="mask_date" style="opacity:0.75; font-size:0.95rem;"></span>
     </div>
 
     <div class="grid-card">
@@ -208,11 +231,15 @@
 
 <div id="globalTooltip"></div>
 
+<script src="./tools/dead_squids.js"></script>
 <script>
   const NX = 16, NF = 60;
   const NC = 32, NR = 33;
   const which_mce= document.getElementById("which_mce");
   const status_txt =document.getElementById("status_txt");
+
+  const toggle_mask = document.getElementById("toggle_mask");
+  const mask_date_el = document.getElementById("mask_date");
 
   const detgrid_xf= document.getElementById("detgrid_xf");
   const yaxis_xf =document.getElementById("yaxis_xf");
@@ -238,6 +265,66 @@
   const maps={mce0: { xf: null, cr: null },mce1: { xf: null, cr: null }};
   function xf_index(x,f){ return x*NF + f; }
   function cr_index(c,r){ return r*NC + c; }
+
+
+  //now i want to be able to show the dead squids from the last tuning 
+  // such that the button will have a black dot on top 
+  // note that we will have to manually update the tools/dead_squids.js after each tune 
+  // for the black dots to reflect current statis 
+
+  const MASK_ROWS= 32; // mask "rows" are detector columns c=0..31
+  const MASK_COLS=33; // mask "cols" are detector rows r=0..32
+  const MASK_EXPECTED_LEN= MASK_ROWS * MASK_COLS; // 1056
+
+  function get_mask_info(which){return window.TIME_DETECTOR_MASKS?.[which] ?? null;}
+
+  // this is just so that we throw an error if we made a misake in pasting in the dead squid.cfg into the dead squid.js
+  function assert_mask(which){
+    const info = get_mask_info(which);
+    if (!info) throw new Error(`dead_squids.js missing from["${which}"]`);
+    if (!Array.isArray(info.flat)) throw new Error(`["${which}"].flat is not an array`);
+    if (info.flat.length !== MASK_EXPECTED_LEN){
+      throw new Error(`Mask length mismatch for ${which}: got ${info.flat.length}, expected ${MASK_EXPECTED_LEN} (32*33).`);}
+    return info.flat;}
+
+  // now make the mask grid
+  function build_mask_c_r(flat){
+    // row-major in the mask file: first index runs over "mask rows" (c), second over "mask cols" (r)
+    // so each "mask row" has 33 entries (r=0..32)
+    return Array.from({ length: MASK_ROWS }, (_, c) => flat.slice(c * MASK_COLS, (c + 1) * MASK_COLS));}
+
+  function get_mask(which){
+    const flat = assert_mask(which); //do the check 
+    return build_mask_c_r(flat);} //now it should be c,r 
+
+  // Read as mask2d[c][r]
+  function mask_value(mask2d, c, r){
+    if (!mask2d) return 0;
+    if (c < 0 || c >= MASK_ROWS)return0; 
+    if (r < 0 || r >= MASK_COLS)return0;  
+    return mask2d[c][r];}
+
+  //also let it print out the date from dead_squid.js
+  function format_date(s){
+    if (typeof s !== "string") return "";
+    return s.replaceAll("_", "-");}
+
+  function update_mask(){
+    const which = which_mce.value;
+    const info = get_mask_info(which);
+
+    // show date only when checked
+    mask_date_el.textContent =
+    (toggle_mask.checked && info?.date) ? `Tuning: ${format_date(info.date)}` : "";
+
+
+    // toggle CSS class on grids (instant)
+    const off = !toggle_mask.checked;
+    detgrid_xf.classList.toggle("no-mask", off);
+    detgrid_cr.classList.toggle("no-mask", off);}
+
+  //to check the pasting for them 
+  function validate_all_masks_or_throw(){assert_mask("mce0");assert_mask("mce1");}
 
   // idk what this does but it was laggy and chatgpt say to do this lol
   let last_mouse = null;
@@ -301,6 +388,7 @@
     const which =which_mce.value;
     const xf=maps[which].xf;
     const frag= document.createDocumentFragment();
+    const mask2d = get_mask(which);
     // order is x=15 top 
     for (let x = NX - 1; x >= 0; x--){
       for (let f = 0; f < NF; f++){
@@ -315,6 +403,8 @@
         cell.dataset.x = x;
         cell.dataset.f = f;
 
+        //if the box is checked also put the squid dot 
+        if (rec && mask_value(mask2d, rec.c, rec.r) === 1){cell.classList.add("masked");}
         frag.appendChild(cell);
       }
     }
@@ -324,6 +414,9 @@
   function make_crgrid(){
     detgrid_cr.innerHTML = "";
     const frag= document.createDocumentFragment();
+    const which = which_mce.value;
+    const mask2d = get_mask(which); 
+
     //order is r=32 at the top 
     for (let r =NR - 1; r>= 0; r--){
       for (let c =0; c< NC; c++){
@@ -335,6 +428,9 @@
         cell.style.background = color_column(c);
         cell.dataset.c=c;
         cell.dataset.r=r;
+
+        //if the box is checked also put the squid dot 
+        if (mask_value(mask2d, c, r) === 1){cell.classList.add("masked");}
         frag.appendChild(cell);
       }
     }
@@ -384,6 +480,7 @@
   // load jsons i made from coordinates.py, under tools folder.
   async function load_mapping(){
     try{
+      validate_all_masks_or_throw();
       status_txt.textContent = "Loading maps…";
       const [m0, m1] = await Promise.all([
         fetch("./tools/detector_map_mce0.json").then(r => {
@@ -411,13 +508,20 @@
       make_axes();
       rebuild_xfcr_grid();
       status_txt.textContent = "Loaded";
+      update_mask();
     } catch (e){
       console.error(e);
-      status_txt.textContent = "Load failed (check json paths).";
+      status_txt.textContent = `Load failed: ${e.message}`;
     }
   }
 
-  which_mce.addEventListener("change", rebuild_xfcr_grid);
+  toggle_mask.addEventListener("change", update_mask);
+
+  which_mce.addEventListener("change", () => {
+    rebuild_xfcr_grid();
+    update_mask();
+  });
+
   load_mapping();
 </script>
 
