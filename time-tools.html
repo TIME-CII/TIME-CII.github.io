@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TIME | Detectors</title>
+<link rel="stylesheet" href="style.css" />
+<script src="script.js" defer></script>
+
+<style>
+  :root{--cell: 15px;--gap: 2px;--ylabel: 28px;--ycol: 46px;--xaxis: 28px;--xlabel: 22px;}
+  body { margin: 0; overflow-x: hidden; }
+  main { max-width: none !important;  overflow: visible; }
+  footer { max-width: none !important; }
+
+  .panel, .grid-card, .grid-wrap,#detgrid_xf, #detgrid_cr { overflow: visible !important; }
+
+  .panel{display: grid;grid-template-rows: auto auto auto; gap: 10px;padding: 0 10px;}
+  
+  .det-controls{display: flex;justify-content: center;gap: 12px ;flex-wrap: wrap;align-items: center;}
+  .det-controls select{padding: 8px 10px;border-radius: 10px;border: 3px solid rgba(0,0,0,0.12);background: white;font-size: 1rem;}
+  
+  #toggle_mask{width: 18px;height: 18px;}
+
+  .grid-card{border-radius: 18px;
+    border:1px solid rgba(0,0,0,0.08);
+    background:rgba(255,255,255,0.9);
+    padding:12px;
+    width:fit-content;
+    margin:0 auto;
+    position:relative;}
+
+  .card-title{text-align: center;font-family: 'Roboto', sans-serif;font-weight:700;margin:2px 0 4px;opacity: 0.9;}
+  .card-subtitle{text-align: center;font-size: 0.9rem;opacity:0.75; margin: 0 0 10px; }
+
+  .grid-wrap{display: grid;
+    grid-template-columns: var(--ylabel) var(--ycol) auto;
+    grid-template-rows:auto var(--xaxis) var(--xlabel);
+    gap:8px 10px;
+    align-items:start;
+    justify-items:start;
+    position: relative; }
+
+  .y-axis-label{grid-column: 1;
+    grid-row:1;
+    writing-mode:vertical-rl;
+    transform:rotate(180deg);
+    font-size:13px;
+    opacity:0.85;
+    align-self: center;
+    justify-self:center;}
+  .x-axis-label{grid-column: 3;
+    grid-row:3;
+    justify-self:center;
+    font-size:13px;
+    opacity:0.85; }
+  .cr-center {
+    display: flex;
+    justify-content: center;}
+
+  /*focal plan*/
+  #yaxis_xf{grid-column: 2; grid-row: 1;
+    display: grid;
+    grid-template-rows: repeat(16, var(--cell));
+    gap: var(--gap);
+    justify-items: end;
+    align-items: center;
+    font-size: 12px;
+    color:#444;
+    line-height: 1;}
+  #xaxis_xf{grid-column: 3; grid-row: 2;
+    display: grid;
+    grid-template-columns: repeat(60, var(--cell));
+    gap: var(--gap);
+    font-size:12px;
+    color:#444;
+    line-height: 1;}
+
+  #detgrid_xf{grid-column: 3; grid-row: 1;
+    display: grid;
+    grid-template-columns: repeat(60, var(--cell));
+    grid-auto-rows: var(--cell);
+    gap: var(--gap);
+    position: relative;}
+
+  /*cr grid*/
+  #yaxis_cr{grid-column: 2; grid-row: 1;
+    display: grid;
+    grid-template-rows:repeat(33, var(--cell));
+    gap: var(--gap);
+    justify-items:end;
+    align-items:center;
+    font-size: 12px;
+    color: #444;
+    line-height: 1; }
+  #xaxis_cr{grid-column: 3; grid-row: 2;
+    display: grid;
+    grid-template-columns: repeat(32, var(--cell));
+    gap:var(--gap);
+    font-size: 12px;
+    color:#444;
+    justify-content: center;
+    line-height: 1;}
+  #detgrid_cr{grid-column: 3; grid-row: 1;
+    display:grid;
+    grid-template-columns: repeat(32, var(--cell));
+    grid-auto-rows:var(--cell);
+    gap: var(--gap);
+    justify-content: center;
+    position: relative;}
+
+  .det-cell{width: var(--cell);
+    height: var(--cell);
+    border:0;padding:0;
+    border-radius:4px;
+    cursor:pointer;
+    position:relative;}
+  .det-cell:hover{outline: 5px solid rgba(0,0,0,0.35);}
+  /*only make it once to reduce lag  */
+
+  /* Tab navigation styles */
+  .tab-nav {
+    display: flex;
+    gap: 12px;
+    border-bottom: 2px solid rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+    padding: 0 10px;
+  }
+  .tab-nav button {
+    background: none;
+    border: none;
+    padding: 12px 16px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    color: rgba(0,0,0,0.6);
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s ease;
+  }
+  .tab-nav button:hover {
+    color: rgba(0,0,0,0.8);
+  }
+  .tab-nav button.active {
+    color: rgba(0,0,0,0.9);
+    border-bottom-color: var(--accent, #0066cc);
+  }
+  .tab-content {
+    display: none;
+  }
+  .tab-content.active {
+    display: block;
+  }
+
+  /* Computer Rack Styles */
+  .rack-container {
+    max-width: 100%;
+    width: 100%;
+    margin: 0 auto;
+    background-color: rgb(173, 192, 198);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    overflow: visible;
+  }
+
+  .rack-views {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    width: 100%;
+    overflow: visible;
+  }
+
+  .rack-section {
+    flex: 1;
+    min-width: 0;
+    overflow: visible;
+  }
+
+  .rack-section h2 {
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  #front-rack-view, #back-rack-view {
+    position: relative;
+    width: 100%;
+    height: 800px;
+    border: 1px solid #ccc;
+    background-color: #e9ecef;
+    overflow: visible;
+  }
+
+  .rack {
+    position: absolute;
+    width: 300px;
+    height: 750px;
+    background-color: #343a40;
+    border: 2px solid #212529;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .box {
+    position: absolute;
+    background-color: #6c757d;
+    border: 1px solid #495057;
+    cursor: pointer;
+  }
+
+  .box:hover {
+    background-color: #5a6268;
+  }
+
+  .box-label {
+    position: absolute;
+    top: 2px;
+    left: 5px;
+    color: white;
+    font-size: 12px;
+    font-weight: normal;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .port {
+    position: absolute;
+    cursor: pointer;
+    margin: 0;
+    padding: 0;
+    line-height: 1;
+    font-size: 0;
+    display: block;
+    transform: translateZ(0);
+    will-change: transform;
+  }
+
+  .port.used {
+    background-color: #28a745;
+    border: 1px solid #155724;
+  }
+
+  .port.unused {
+    background-color: #adb5bd;
+    border: 1px solid #343a40;
+  }
+
+  /* Port shapes and sizes */
+  .port.power-military {
+    width: 20px;
+    height: 15px;
+    border-radius: 3px;
+    background-color: #ffc107;
+    border: 2px solid #e0a800;
+  }
+
+  .port.power-military.used {
+    background-color: #28a745;
+    border-color: #1e7e34;
+  }
+
+  .port.serial-small {
+    width: 15px;
+    height: 8px;
+    border-radius: 2px;
+  }
+
+  .port.serial-wide {
+    width: 35px;
+    height: 8px;
+    border-radius: 2px;
+  }
+
+  .port.switch-small {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+
+  .port.circular {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  .port.power-circular {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background-color: #ffc107;
+    border: 2px solid #e0a800;
+  }
+
+  .port.power-circular.used {
+    background-color: #28a745;
+    border-color: #1e7e34;
+  }
+
+  .port.ethernet {
+    width: 16px;
+    height: 8px;
+    background-color: #adb5bd;
+    border: 1px solid #343a40;
+    border-radius: 2px;
+  }
+
+  .port.ssd-bay {
+    width: 80px;
+    height: 12px;
+    background-color: #6c757d;
+    border: 1px solid #495057;
+    border-radius: 3px;
+  }
+
+  .port.ssd-bay.used {
+    background-color: #28a745;
+    border-color: #1e7e34;
+  }
+
+  .port.usb-vertical {
+    width: 8px;
+    height: 16px;
+    background-color: #6c757d;
+    border: 1px solid #495057;
+    border-radius: 2px;
+  }
+
+  .port.usb-vertical.used {
+    background-color: #28a745;
+    border-color: #1e7e34;
+  }
+
+  .port.light-circular {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: #b9b8b8;
+    border: 1px solid #848484;
+  }
+
+  .port.light-circular.green {
+    background-color: #28a745;
+    border-color: #1e7e34;
+  }
+
+  .port.light-circular-green {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: #28a745;
+    border: 1px solid #1e7e34;
+  }
+
+  .port.button-circular {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #6c757d;
+    border: 1px solid #495057;
+    cursor: pointer;
+  }
+
+  .port.button-circular:hover {
+    background-color: #5a6268;
+  }
+
+  .detail-box {
+    position: relative;
+    width: 260px;
+    height: 80px;
+    background-color: #6c757d;
+    border: 1px solid #495057;
+  }
+
+  .empty-back-view {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f8f9fa;
+    border: 2px dashed #dee2e6;
+    width: 260px;
+    height: 80px;
+  }
+
+  .no-back-view {
+    color: #6c757d;
+    font-size: 16px;
+    font-style: italic;
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 10px;
+  }
+
+  .modal-header h3 {
+    margin: 0;
+  }
+
+  .close-button {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #6c757d;
+  }
+
+  .close-button:hover {
+    color: #000;
+  }
+
+  .detail-views-container {
+    display: flex;
+    gap: 20px;
+  }
+
+  .detail-section {
+    flex: 1;
+  }
+
+  .detail-section h4 {
+    margin-top: 0;
+    color: #495057;
+  }
+
+  .detail-view {
+    display: flex;
+    justify-content: center;
+    padding: 10px;
+  }
+
+  #globalTooltip{position: fixed;
+    left: 0;
+    top: 0;
+    transform: translate(-9999px, -9999px);
+    background: rgba(0,0,0,0.93);
+    color: #fff;
+    padding: 12px 14px;
+    border-radius: 12px;
+    font-size: 16px;
+    line-height: 1.35;
+    white-space: pre;
+    z-index: 999999999; /*lol cuz i can */       
+    will-change: transform;
+    display: none;} /* hide that box if not hovering*/
+
+
+  /* when mask overlay is disabled, hide the dot */
+  #detgrid_xf.no-mask .det-cell.masked::after,
+  #detgrid_cr.no-mask .det-cell.masked::after{display:none;}
+
+  /* black dot overlay for dead squids*/
+  .det-cell.masked::after{
+  content:"";
+  position:absolute;
+  inset:2px;
+  border-radius:999px;
+  background: rgba(0,0,0,0.92);
+  pointer-events:none;
+  }
+</style>
+</head>
+
+<body>
+<header class="nav-shell">
+  <a href="index.html"><img src="images/TIME_logo.png" alt="TIME" class="brand-logo"></a>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="instrument.html">Instrument</a>
+    <a href="status.html">Status</a>
+    <a href="how-to.html">How To</a>
+    <a href="team.html">Team</a>
+    <a href="time-tools.html" class="current">TIME Tools</a>
+  </nav>
+</header>
+
+<main>
+
+  <!-- Tab Navigation -->
+  <div class="tab-nav">
+    <button class="tab-button active" data-tab="detector-mapping">Detector Mapping</button>
+    <button class="tab-button" data-tab="computer-rack">Computer Rack</button>
+  </div>
+
+  <!-- Detector Mapping Tab -->
+  <div id="detector-mapping" class="tab-content active">
+  <!-- now they all under the same section  -->
+  <section class="panel">
+
+    <div style="text-align:center;">
+      <h2 style="margin: 0 0 6px;">Detector mapping</h2>
+      <p style="margin: 0; opacity: 0.8;">
+        Colored by MUX column. Hover shows corresponding indices. <br>
+        Check the show dead squids box to show which squid is dead from the last tuning <br>
+        Note that after a tuning you will need to update the <code>tools/dead_squids.js</code> file manually 
+      </p>
+    </div>
+
+    <div class="det-controls">
+      <label for="which_mce"><b>MCE:</b></label>
+      <select id="which_mce">
+        <option value="mce0">MCE0 - Spec A</option>
+        <option value="mce1">MCE1 - Spec B</option>
+      </select>
+      <span id="status_txt" style="opacity:0.75; font-size:0.95rem;">Loading maps…</span>
+
+      <label style="display:flex; align-items:center; gap:8px;font-weight:600;">
+      <input type="checkbox" id="toggle_mask">Show Dead Squids</label>
+      <span id="mask_date" style="opacity:0.75; font-size:0.95rem;"></span>
+    </div>
+
+    <div class="grid-card">
+
+      <!-- part 1: (x,f) -->
+      <div class="card-title">(x, f) focal plane</div>
+      <div class="grid-wrap">
+        <div class="y-axis-label">x</div>
+        <div id="yaxis_xf"></div>
+        <div id="detgrid_xf"></div>
+        <div id="xaxis_xf"></div>
+        <div class="x-axis-label">f</div>
+      </div>
+
+      <div style="height:14px;"></div>
+
+      <!-- pat 2: (c,r) -->
+      <div class="card-title">(c, r) MUX grid</div>
+      <div class="cr-center">
+        <div class="grid-wrap">
+          <div class="y-axis-label">r</div>
+          <div id="yaxis_cr"></div>
+
+          <div id="detgrid_cr"></div>
+
+          <div id="xaxis_cr"></div>
+          <div class="x-axis-label">c</div>
+        </div>
+      </div>
+
+
+    </div>
+
+  </section>
+  </div>
+
+  <!-- Computer Rack Tab -->
+  <div id="computer-rack" class="tab-content">
+    <div style="width: 100%; overflow: visible;">
+      <h1 style="text-align: center; margin-top: 20px;">Computer Rack Visualization</h1>
+      <div class="rack-container">
+        <div class="rack-views">
+          <div class="rack-section">
+            <h2>Front View</h2>
+            <div id="front-rack-view"></div>
+          </div>
+          <div class="rack-section">
+            <h2>Back View</h2>
+            <div id="back-rack-view"></div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Detail Modal -->
+      <div id="box-detail" class="modal-content modal hidden">
+        <div class="modal-header">
+          <h3 id="box-title">Box Details</h3>
+          <button id="close-detail" class="close-button">&times;</button>
+        </div>
+        <div class="detail-views-container">
+          <div class="detail-section">
+            <h4>Front View</h4>
+            <div id="detail-front-view" class="detail-view">
+              <!-- Front view detail box will be rendered here -->
+            </div>
+          </div>
+          <div class="detail-section">
+            <h4>Back View</h4>
+            <div id="detail-back-view" class="detail-view">
+              <!-- Back view detail box will be rendered here -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <p>TIME collaboration • Tomographic Ionized-carbon Mapping Experiment</p>
+</footer>
+
+<div id="globalTooltip"></div>
+
+<script src="./tools/dead_squids.js"></script>
+<script>
+  // Tab switching functionality
+  const tabButtons = document.querySelectorAll('.tab-button');
+  const tabContents = document.querySelectorAll('.tab-content');
+  
+  tabButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const tabId = button.dataset.tab;
+      
+      // Remove active class from all tabs and buttons
+      tabButtons.forEach(btn => btn.classList.remove('active'));
+      tabContents.forEach(content => content.classList.remove('active'));
+      
+      // Add active class to clicked button and corresponding content
+      button.classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+      
+      // Trigger rack drawing if switching to computer-rack tab
+      if (tabId === 'computer-rack') {
+        setTimeout(() => {
+          initializeComputerRack();
+        }, 100);
+      }
+    });
+  });
+
+  // Computer Rack Data and Functions
+  const rackData = {
+    front: [
+        {
+            id: 'sync',
+            name: 'Sync Box',
+            top: 20,
+            left: 20,
+            width: 260,
+            height: 80,
+            ports: [
+                { id: 'power', label: 'Military Power', x: 10, y: 50, used: true, type: 'power-circular', message: 'Connects to computer rack power strip' },
+                { id: 'serial-small', label: 'Serial Small', x: 30, y: 30, used: true, type: 'serial-small', message: 'Unused' },
+                { id: 'serial-wide1', label: 'Serial Wide 1', x: 70, y: 30, used: true, type: 'serial-wide', message: 'Connects to V2 box (MCE Sync In) using a serial cable' },
+                { id: 'serial-wide2', label: 'Serial Wide 2', x: 120, y: 30, used: false, type: 'serial-wide', message: 'Unused' },
+                { id: 'switch', label: 'Switch', x: 190, y: 30, used: false, type: 'switch-small', message: 'Switch - unused' },
+                { id: 'circular1', label: 'Circular 1', x: 210, y: 30, used: true, type: 'circular', message: 'Sync CJ5 TTL IN - connects to the Meinburg Synth port using a BNC cable' },
+                { id: 'circular2', label: 'Circular 2', x: 230, y: 30, used: false, type: 'circular', message: 'Unused' },
+                { id: 'circular3', label: 'Circular 3', x: 40, y: 60, used: false, type: 'circular', message: 'Unused : DO NOT USE' },
+                { id: 'circular4', label: 'Circular 4', x: 60, y: 60, used: true, type: 'circular', message: 'Connects to MCE1 box on cryo using a fiber cable' },
+                { id: 'circular5', label: 'Circular 5', x: 80, y: 60, used: true, type: 'circular', message: 'Connects to MCE0 box on cryo using a fiber cable' },
+                { id: 'circular6', label: 'Circular 6', x: 100, y: 60, used: false, type: 'circular', message: 'Unused' },
+                { id: 'circular7', label: 'Circular 7', x: 120, y: 60, used: false, type: 'circular', message: 'Unused' },
+                { id: 'circular8', label: 'Circular 8', x: 140, y: 60, used: false, type: 'circular', message: 'Unused' },
+                { id: 'circular9', label: 'Circular 9', x: 160, y: 60, used: false, type: 'circular', message: 'Unused' },
+                { id: 'circular10', label: 'Circular 10', x: 180, y: 60, used: false, type: 'circular', message: 'Unused' }
+            ]
+        },
+        {
+            id: 'switch',
+            name: 'Ethernet Network Switch',
+            top: 110,
+            left: 20,
+            width: 260,
+            height: 80,
+            ports: [
+                { id: 'eth1', label: 'Ethernet 1', x: 5, y: 30, used: false, type: 'ethernet', message: 'Ethernet port 1' },
+                { id: 'eth2', label: 'Ethernet 2', x: 26, y: 30, used: false, type: 'ethernet', message: 'Ethernet port 2' },
+                { id: 'eth3', label: 'Ethernet 3', x: 47, y: 30, used: false, type: 'ethernet', message: 'Ethernet port 3' },
+                { id: 'eth4', label: 'Ethernet 4', x: 68, y: 30, used: false, type: 'ethernet', message: 'Ethernet port 4' },
+                { id: 'eth5', label: 'Ethernet 5', x: 89, y: 30, used: false, type: 'ethernet', message: 'Ethernet port 5' },
+                { id: 'eth6', label: 'Ethernet 6', x: 110, y: 30, used: false, type: 'ethernet', message: 'Ethernet port 6' },
+                { id: 'eth7', label: 'Ethernet 7', x: 136, y: 30, used: false, type: 'ethernet', message: 'Ethernet port 7' },
+                { id: 'eth8', label: 'Ethernet 8', x: 157, y: 30, used: false, type: 'ethernet', message: 'Ethernet port 8' },
+                { id: 'eth9', label: 'Ethernet 9', x: 178, y: 30, used: false, type: 'ethernet', message: 'Ethernet port 9' },
+                { id: 'eth10', label: 'Ethernet 10', x: 199, y: 30, used: false, type: 'ethernet', message: 'Ethernet port 10' },
+                { id: 'eth11', label: 'Ethernet 11', x: 220, y: 30, used: false, type: 'ethernet', message: 'Ethernet port 11' },
+                { id: 'eth12', label: 'Ethernet 12', x: 241, y: 30, used: false, type: 'ethernet', message: 'Ethernet port 12' },
+                { id: 'eth13', label: 'Ethernet 13', x: 5, y: 60, used: false, type: 'ethernet', message: 'Ethernet port 13' },
+                { id: 'eth14', label: 'Ethernet 14', x: 26, y: 60, used: false, type: 'ethernet', message: 'Ethernet port 14' },
+                { id: 'eth15', label: 'Ethernet 15', x: 47, y: 60, used: false, type: 'ethernet', message: 'Ethernet port 15' },
+                { id: 'eth16', label: 'Ethernet 16', x: 68, y: 60, used: false, type: 'ethernet', message: 'Ethernet port 16' },
+                { id: 'eth17', label: 'Ethernet 17', x: 89, y: 60, used: false, type: 'ethernet', message: 'Ethernet port 17' },
+                { id: 'eth18', label: 'Ethernet 18', x: 110, y: 60, used: false, type: 'ethernet', message: 'Ethernet port 18' },
+                { id: 'eth19', label: 'Ethernet 19', x: 136, y: 60, used: false, type: 'ethernet', message: 'Ethernet port 19' },
+                { id: 'eth20', label: 'Ethernet 20', x: 157, y: 60, used: false, type: 'ethernet', message: 'Ethernet port 20' },
+                { id: 'eth21', label: 'Ethernet 21', x: 178, y: 60, used: false, type: 'ethernet', message: 'Ethernet port 21' },
+                { id: 'eth22', label: 'Ethernet 22', x: 199, y: 60, used: false, type: 'ethernet', message: 'Ethernet port 22' },
+                { id: 'eth23', label: 'Ethernet 23', x: 220, y: 60, used: false, type: 'ethernet', message: 'Ethernet port 23' },
+                { id: 'eth24', label: 'Ethernet 24', x: 241, y: 60, used: false, type: 'ethernet', message: 'Ethernet port 24' }
+            ]
+        },
+        {
+            id: 'time-mce-0',
+            name: 'time-MCE-0',
+            top: 200,
+            left: 20,
+            width: 260,
+            height: 80,
+            ports: [
+                { id: 'ssd1', label: 'SSD Bay 1', x: 20, y: 25, used: true, type: 'ssd-bay', message: 'SSD storage bay 1' },
+                { id: 'ssd2', label: 'SSD Bay 2', x: 20, y: 43, used: true, type: 'ssd-bay', message: 'SSD storage bay 2' },
+                { id: 'usb1', label: 'USB Port 1', x: 125, y: 15, used: false, type: 'usb-vertical', message: 'USB port 1' },
+                { id: 'usb2', label: 'USB Port 2', x: 140, y: 15, used: true, type: 'usb-vertical', message: 'Connect to sync box through USB to Serial' },
+                { id: 'light1', label: 'Status Light 1', x: 120, y: 40, used: false, type: 'light-circular-green', message: 'Status indicator 1 (Power)' },
+                { id: 'light2', label: 'Status Light 2', x: 135, y: 40, used: false, type: 'light-circular', message: 'Status indicator 2' },
+                { id: 'light3', label: 'Status Light 3', x: 150, y: 40, used: false, type: 'light-circular', message: 'Status indicator 3' },
+                { id: 'power-btn', label: 'Power Button', x: 125, y: 55, used: true, type: 'button-circular', message: 'Power button' },
+                { id: 'reset-btn', label: 'Reset Button', x: 140, y: 55, used: true, type: 'button-circular', message: 'Reset button' }
+            ]
+        },
+        {
+            id: 'time-mce-1',
+            name: 'time-MCE-1',
+            top: 290,
+            left: 20,
+            width: 260,
+            height: 80,
+            ports: [
+                { id: 'ssd1', label: 'SSD Bay 1', x: 20, y: 25, used: true, type: 'ssd-bay', message: 'SSD storage bay 1' },
+                { id: 'ssd2', label: 'SSD Bay 2', x: 20, y: 43, used: true, type: 'ssd-bay', message: 'SSD storage bay 2' },
+                { id: 'usb1', label: 'USB Port 1', x: 125, y: 15, used: false, type: 'usb-vertical', message: 'USB port 1' },
+                { id: 'usb2', label: 'USB Port 2', x: 140, y: 15, used: false, type: 'usb-vertical', message: 'USB port 2' },
+                { id: 'light1', label: 'Status Light 1', x: 120, y: 40, used: false, type: 'light-circular-green', message: 'Status indicator 1 (Power)' },
+                { id: 'light2', label: 'Status Light 2', x: 135, y: 40, used: false, type: 'light-circular', message: 'Status indicator 2' },
+                { id: 'light3', label: 'Status Light 3', x: 150, y: 40, used: false, type: 'light-circular', message: 'Status indicator 3' },
+                { id: 'power-btn', label: 'Power Button', x: 125, y: 55, used: false, type: 'button-circular', message: 'Power button' },
+                { id: 'reset-btn', label: 'Reset Button', x: 140, y: 55, used: false, type: 'button-circular', message: 'Reset button' }
+            ]
+        },
+        {
+            id: 'time-hk',
+            name: 'time-HK',
+            top: 380,
+            left: 20,
+            width: 260,
+            height: 80,
+            ports: [
+                { id: 'ssd1', label: 'SSD Bay 1', x: 20, y: 25, used: true, type: 'ssd-bay', message: 'SSD storage bay 1' },
+                { id: 'ssd2', label: 'SSD Bay 2', x: 20, y: 43, used: true, type: 'ssd-bay', message: 'SSD storage bay 2' },
+                { id: 'usb1', label: 'USB Port 1', x: 125, y: 15, used: true, type: 'usb-vertical', message: 'USB port 1 - Connects to front of V2 using a USB to printer cable' },
+                { id: 'usb2', label: 'USB Port 2', x: 140, y: 15, used: true, type: 'usb-vertical', message: 'USB port 2 - Connects to the back of V1' },
+                { id: 'light1', label: 'Status Light 1', x: 120, y: 40, used: false, type: 'light-circular-green', message: 'Status indicator 1 (Power)' },
+                { id: 'light2', label: 'Status Light 2', x: 135, y: 40, used: false, type: 'light-circular', message: 'Status indicator 2' },
+                { id: 'light3', label: 'Status Light 3', x: 150, y: 40, used: false, type: 'light-circular', message: 'Status indicator 3' },
+                { id: 'power-btn', label: 'Power Button', x: 125, y: 55, used: false, type: 'button-circular', message: 'Power button' },
+                { id: 'reset-btn', label: 'Reset Button', x: 140, y: 55, used: false, type: 'button-circular', message: 'Reset button' }
+            ]
+        },
+        {
+            id: 'v1',
+            name: 'V1',
+            top: 470,
+            left: 20,
+            width: 260,
+            height: 80
+        },
+        {
+            id: 'v2',
+            name: 'V2',
+            top: 560,
+            left: 20,
+            width: 260,
+            height: 80
+        },
+        {
+            id: 'power1',
+            name: 'Power Strip 1',
+            top: 650,
+            left: 20,
+            width: 260,
+            height: 40
+        },
+        {
+            id: 'power2',
+            name: 'Power Strip 2',
+            top: 700,
+            left: 20,
+            width: 260,
+            height: 40
+        }
+    ],
+    back: [
+        {
+            id: 'lakeshore',
+            name: 'Lakeshore Box',
+            top: 20,
+            left: 20,
+            width: 260,
+            height: 80
+        },
+        {
+            id: 'mce0_back',
+            name: 'MCE0 Computer (Back)',
+            top: 110,
+            left: 20,
+            width: 260,
+            height: 80
+        },
+        {
+            id: 'mce1_back',
+            name: 'MCE1 Computer (Back)',
+            top: 200,
+            left: 20,
+            width: 260,
+            height: 80
+        },
+        {
+            id: 'hk_back',
+            name: 'HK Computer (Back)',
+            top: 290,
+            left: 20,
+            width: 260,
+            height: 80
+        },
+        {
+            id: 'lakeshore_thermometry',
+            name: 'Lakeshore Thermometry',
+            top: 380,
+            left: 20,
+            width: 120,
+            height: 80
+        },
+        {
+            id: 'meinburg',
+            name: 'Meinberg Box',
+            top: 380,
+            left: 160,
+            width: 120,
+            height: 80
+        },
+        {
+            id: 'v1_v2_power',
+            name: 'V1 V2 Power Supply',
+            top: 470,
+            left: 20,
+            width: 260,
+            height: 80
+        },
+        {
+            id: 'mce1_power',
+            name: 'MCE1 Power Supply',
+            top: 560,
+            left: 20,
+            width: 260,
+            height: 80
+        },
+        {
+            id: 'mce0_power',
+            name: 'MCE0 Power Supply',
+            top: 650,
+            left: 20,
+            width: 260,
+            height: 80
+        }
+    ]
+  };
+
+  function drawRack(view, containerId) {
+    const rackView = document.getElementById(containerId);
+    if (!rackView) return;
+    rackView.innerHTML = '<div class="rack"></div>';
+    const rack = rackView.querySelector('.rack');
+
+    rackData[view].forEach(box => {
+        const boxElement = document.createElement('div');
+        boxElement.className = 'box';
+        boxElement.style.top = box.top + 'px';
+        boxElement.style.left = box.left + 'px';
+        boxElement.style.width = box.width + 'px';
+        boxElement.style.height = box.height + 'px';
+        boxElement.addEventListener('click', () => {
+            showBoxDetail(box);
+        });
+
+        const labelElement = document.createElement('div');
+        labelElement.className = 'box-label';
+        labelElement.textContent = box.name;
+        boxElement.appendChild(labelElement);
+
+        if (box.ports) {
+            box.ports.forEach(port => {
+                const portElement = document.createElement('div');
+                portElement.className = 'port ' + (port.used ? 'used' : 'unused') + ' ' + (port.type || 'circular');
+                portElement.style.left = port.x + 'px';
+                portElement.style.top = port.y + 'px';
+                portElement.title = port.label;
+                boxElement.appendChild(portElement);
+            });
+        }
+
+        rack.appendChild(boxElement);
+    });
+  }
+
+  function initializeComputerRack() {
+    const boxDetailEl = document.getElementById('box-detail');
+    if (boxDetailEl) {
+      boxDetailEl.classList.add('hidden');
+    }
+    drawRack('front', 'front-rack-view');
+    drawRack('back', 'back-rack-view');
+  }
+
+  let currentBox = null;
+
+  function showBoxDetail(box) {
+    currentBox = box;
+    const boxTitleEl = document.getElementById('box-title');
+    if (boxTitleEl) {
+      boxTitleEl.textContent = box.name;
+    }
+    
+    const boxDetailEl = document.getElementById('box-detail');
+    if (boxDetailEl) {
+      boxDetailEl.classList.remove('hidden');
+    }
+    drawDetailFrontView(box);
+    drawDetailBackView(box);
+  }
+
+  function drawDetailFrontView(box) {
+    const detailView = document.getElementById('detail-front-view');
+    if (!detailView) return;
+    detailView.innerHTML = '<div class="detail-box"></div>';
+    const detailBox = detailView.querySelector('.detail-box');
+
+    detailBox.style.width = box.width + 'px';
+    detailBox.style.height = box.height + 'px';
+
+    if (box.ports) {
+        box.ports.forEach(port => {
+            const portElement = document.createElement('div');
+            portElement.className = 'port ' + (port.used ? 'used' : 'unused') + ' ' + (port.type || 'circular');
+            portElement.style.left = port.x + 'px';
+            portElement.style.top = port.y + 'px';
+            portElement.title = port.label;
+            portElement.addEventListener('click', (e) => {
+                e.stopPropagation();
+                alert(port.message || (port.label + ' - ' + (port.used ? 'Used' : 'Unused')));
+            });
+            detailBox.appendChild(portElement);
+        });
+    }
+  }
+
+  function drawDetailBackView(box) {
+    const detailView = document.getElementById('detail-back-view');
+    if (!detailView) return;
+    
+    let backBox = rackData.back.find(b => 
+        b.id === box.id + '_back' ||
+        (box.id === 'time-mce-0' && b.id === 'mce0_back') ||
+        (box.id === 'time-mce-1' && b.id === 'mce1_back') ||
+        (box.id === 'time-hk' && b.id === 'hk_back') ||
+        b.id === box.id.replace('_back', '')
+    );
+    
+    if (backBox) {
+        detailView.innerHTML = '<div class="detail-box"></div>';
+        const detailBox = detailView.querySelector('.detail-box');
+        
+        detailBox.style.width = backBox.width + 'px';
+        detailBox.style.height = backBox.height + 'px';
+
+        if (backBox.ports) {
+            backBox.ports.forEach(port => {
+                const portElement = document.createElement('div');
+                portElement.className = 'port ' + (port.used ? 'used' : 'unused') + ' ' + (port.type || 'circular');
+                portElement.style.left = port.x + 'px';
+                portElement.style.top = port.y + 'px';
+                portElement.title = port.label;
+                portElement.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    alert(port.message || (port.label + ' - ' + (port.used ? 'Used' : 'Unused')));
+                });
+                detailBox.appendChild(portElement);
+            });
+        }
+    } else {
+        detailView.innerHTML = '<div class="detail-box empty-back-view"><div class="no-back-view">No back view available</div></div>';
+    }
+  }
+
+  const closeDetailBtn = document.getElementById('close-detail');
+  if (closeDetailBtn) {
+    closeDetailBtn.addEventListener('click', () => {
+      const boxDetailEl = document.getElementById('box-detail');
+      if (boxDetailEl) {
+        boxDetailEl.classList.add('hidden');
+      }
+    });
+  }
+</script>
+<script>
+  const NX = 16, NF = 60;
+  const NC = 32, NR = 33;
+  const which_mce= document.getElementById("which_mce");
+  const status_txt =document.getElementById("status_txt");
+
+  const toggle_mask = document.getElementById("toggle_mask");
+  const mask_date_el = document.getElementById("mask_date");
+
+  const detgrid_xf= document.getElementById("detgrid_xf");
+  const yaxis_xf =document.getElementById("yaxis_xf");
+  const xaxis_xf=document.getElementById("xaxis_xf");
+  const detgrid_cr = document.getElementById("detgrid_cr");
+  const yaxis_cr = document.getElementById("yaxis_cr");
+  const xaxis_cr= document.getElementById("xaxis_cr");
+  //make a box that shows the detector indeces
+  const tooltip = document.getElementById("globalTooltip");
+  // now with real color scheme that evan sent
+  const colors32 = ['#1f77b4', '#669fce', '#aec7e8', '#ff7f0e', '#ff9d43', '#ffbb78',
+    '#2ca02c', '#62c05b', '#98df8a', '#d62728', '#eb605f', '#ff9896',
+    '#9467bd', '#ac8cc9', '#c5b0d5', '#8c564b', '#a87970', '#c49c94',
+    '#e377c2', '#ed96ca', '#f7b6d2', '#7f7f7f', '#a3a3a3', '#c7c7c7',
+    '#bcbd22', '#cccc58', '#dbdb8d', '#17becf', '#5accda', '#9edae5'];
+
+  function color_column(c){return colors32[c%32];}
+
+  //we store mappings as flat arrays so that the website doesn't have to load info about individual detectors
+  //xf: idx = x*NF+f (x in range(16), f in range(60))
+  //cr: idx = r*NC+c (r in range(33), c in range(32))
+
+  const maps={mce0: { xf: null, cr: null },mce1: { xf: null, cr: null }};
+  function xf_index(x,f){ return x*NF + f; }
+  function cr_index(c,r){ return r*NC + c; }
+
+
+  //now i want to be able to show the dead squids from the last tuning 
+  // such that the button will have a black dot on top 
+  // note that we will have to manually update the tools/dead_squids.js after each tune 
+  // for the black dots to reflect current statis 
+
+  const MASK_ROWS= 32; // mask "rows" are detector columns c=0..31
+  const MASK_COLS=33; // mask "cols" are detector rows r=0..32
+  const MASK_EXPECTED_LEN= MASK_ROWS * MASK_COLS; // 1056
+
+  function get_mask_info(which){return window.TIME_DETECTOR_MASKS?.[which] ?? null;}
+
+  // this is just so that we throw an error if we made a misake in pasting in the dead squid.cfg into the dead squid.js
+  function assert_mask(which){
+    const info = get_mask_info(which);
+    if (!info) throw new Error(`dead_squids.js missing from["${which}"]`);
+    if (!Array.isArray(info.flat)) throw new Error(`["${which}"].flat is not an array`);
+    if (info.flat.length !== MASK_EXPECTED_LEN){
+      throw new Error(`Mask length mismatch for ${which}: got ${info.flat.length}, expected ${MASK_EXPECTED_LEN} (32*33).`);}
+    return info.flat;}
+
+  // now make the mask grid
+  function build_mask_c_r(flat){
+    // row-major in the mask file: first index runs over "mask rows" (c), second over "mask cols" (r)
+    // so each "mask row" has 33 entries (r=0..32)
+    return Array.from({ length: MASK_ROWS }, (_, c) => flat.slice(c * MASK_COLS, (c + 1) * MASK_COLS));}
+
+  function get_mask(which){
+    const flat = assert_mask(which); //do the check 
+    return build_mask_c_r(flat);} //now it should be c,r 
+
+  // Read as mask2d[c][r]
+  function mask_value(mask2d, c, r){
+    if (!mask2d) return 0;
+    if (c < 0 || c >= MASK_ROWS)return0; 
+    if (r < 0 || r >= MASK_COLS)return0;  
+    return mask2d[c][r];}
+
+  //also let it print out the date from dead_squid.js
+  function format_date(s){
+    if (typeof s !== "string") return "";
+    return s.replaceAll("_", "-");}
+
+  function update_mask(){
+    const which = which_mce.value;
+    const info = get_mask_info(which);
+
+    // show date only when checked
+    mask_date_el.textContent =
+    (toggle_mask.checked && info?.date) ? `Tuning: ${format_date(info.date)}` : "";
+
+
+    // toggle CSS class on grids (instant)
+    const off = !toggle_mask.checked;
+    detgrid_xf.classList.toggle("no-mask", off);
+    detgrid_cr.classList.toggle("no-mask", off);}
+
+  //to check the pasting for them 
+  function validate_all_masks_or_throw(){assert_mask("mce0");assert_mask("mce1");}
+
+  // idk what this does but it was laggy and chatgpt say to do this lol
+  let last_mouse = null;
+  let rafPending = false;
+
+  function show_info(text){tooltip.textContent = text;tooltip.style.display = "block";}
+  function hide_info(){
+    tooltip.style.display = "none";
+    tooltip.style.transform = "translate(-9999px, -9999px)";
+    last_mouse=null;
+    rafPending=false;
+  }
+  function queue_info_move(e){
+    last_mouse = e;
+    if (rafPending) return;
+    rafPending = true;
+
+    requestAnimationFrame(() => {
+      rafPending = false;
+      if (!last_mouse || tooltip.style.display === "none") return;
+
+      const pad=12;
+      const offset = 14;
+
+      const rect = tooltip.getBoundingClientRect();
+      let x= last_mouse.clientX - rect.width / 2;
+      let y= last_mouse.clientY - rect.height - offset;
+      x= Math.max(pad, Math.min(x, window.innerWidth  - rect.width  - pad));
+      y= Math.max(pad, Math.min(y, window.innerHeight - rect.height - pad));
+
+      tooltip.style.transform = `translate(${x}px, ${y}px)`;
+    });
+  }
+
+  function make_axes(){
+    yaxis_xf.innerHTML = "";
+    for (let x = NX - 1; x >= 0; x--){
+      const d = document.createElement("div");
+      d.textContent = x;
+      yaxis_xf.appendChild(d);}
+    xaxis_xf.innerHTML = "";
+    for (let f = 0; f < NF; f++){
+      const d = document.createElement("div");
+      d.textContent =(f%5 === 0) ? f : "";
+      xaxis_xf.appendChild(d);}
+    yaxis_cr.innerHTML = "";
+    for (let r = NR - 1; r >= 0; r--){
+      const d = document.createElement("div");
+      d.textContent = r;
+      yaxis_cr.appendChild(d);}
+    xaxis_cr.innerHTML = "";
+    for (let c = 0; c < NC; c++){
+      const d = document.createElement("div");
+      d.textContent =(c%4 === 0) ? c : "";
+      xaxis_cr.appendChild(d);}
+  }
+
+  //build grids
+  function make_xfgrid(){
+    detgrid_xf.innerHTML = "";
+    const which =which_mce.value;
+    const xf=maps[which].xf;
+    const frag= document.createDocumentFragment();
+    const mask2d = get_mask(which);
+    // order is x=15 top 
+    for (let x = NX - 1; x >= 0; x--){
+      for (let f = 0; f < NF; f++){
+        const idx = xf_index(x,f);
+        const rec = xf[idx];
+        const cell = document.createElement("button");
+        cell.className = "det-cell";
+        cell.type = "button";
+        if (rec) cell.style.background = color_column(rec.c);
+
+        //store indices for hover 
+        cell.dataset.x = x;
+        cell.dataset.f = f;
+
+        //if the box is checked also put the squid dot 
+        if (rec && mask_value(mask2d, rec.c, rec.r) === 1){cell.classList.add("masked");}
+        frag.appendChild(cell);
+      }
+    }
+    detgrid_xf.appendChild(frag);
+  }
+
+  function make_crgrid(){
+    detgrid_cr.innerHTML = "";
+    const frag= document.createDocumentFragment();
+    const which = which_mce.value;
+    const mask2d = get_mask(which); 
+
+    //order is r=32 at the top 
+    for (let r =NR - 1; r>= 0; r--){
+      for (let c =0; c< NC; c++){
+        const cell = document.createElement("button");
+        cell.className = "det-cell";
+        cell.type = "button";
+
+        //color by c
+        cell.style.background = color_column(c);
+        cell.dataset.c=c;
+        cell.dataset.r=r;
+
+        //if the box is checked also put the squid dot 
+        if (mask_value(mask2d, c, r) === 1){cell.classList.add("masked");}
+        frag.appendChild(cell);
+      }
+    }
+    detgrid_cr.appendChild(frag);
+  }
+
+  function rebuild_xfcr_grid(){hide_info();make_xfgrid();make_crgrid();}
+
+  //hover for xf grid
+  detgrid_xf.addEventListener("mousemove", (e) => {
+    const t = e.target;
+    if (!(t instanceof HTMLElement)) return;
+    if (!t.classList.contains("det-cell")) return;
+
+    const which = which_mce.value;
+    const xf = maps[which].xf;
+    const x = Number(t.dataset.x);
+    const f = Number(t.dataset.f);
+    const rec = xf[xf_index(x,f)];
+    const c = rec ? rec.c : "NA";
+    const r = rec ? rec.r : "NA";
+
+    show_info(`${which.toUpperCase()}\n` +`x = ${x}   f = ${f}\n` +`c = ${c}   r = ${r}`);
+    queue_info_move(e);
+  });
+  detgrid_xf.addEventListener("mouseleave", hide_info);
+
+  //hover for cr
+  detgrid_cr.addEventListener("mousemove", (e) => {
+    const t = e.target;
+    if (!(t instanceof HTMLElement)) return;
+    if (!t.classList.contains("det-cell")) return;
+
+    const which = which_mce.value;
+    const cr = maps[which].cr;
+    const c= Number(t.dataset.c);
+    const r= Number(t.dataset.r);
+    const rec = cr[cr_index(c,r)];
+    const x=rec ? rec.x : "NA";
+    const f=rec ? rec.f : "NA";
+
+    show_info(`${which.toUpperCase()}\n` +`c = ${c}   r = ${r}\n` +`x = ${x}   f = ${f}`);
+    queue_info_move(e);
+  });
+  detgrid_cr.addEventListener("mouseleave", hide_info);
+
+  // load jsons i made from coordinates.py, under tools folder.
+  async function load_mapping(){
+    try{
+      validate_all_masks_or_throw();
+      status_txt.textContent = "Loading maps…";
+      const [m0, m1] = await Promise.all([
+        fetch("./tools/detector_map_mce0.json").then(r => {
+          if(!r.ok) throw new Error("Failed to load detector_map_mce0.json");
+          return r.json();
+        }),
+        fetch("./tools/detector_map_mce1.json").then(r => {
+          if(!r.ok) throw new Error("Failed to load detector_map_mce1.json");
+          return r.json();
+        })
+      ]);
+
+      //build xf
+      maps.mce0.xf = new Array(NX*NF).fill(null);
+      maps.mce1.xf = new Array(NX*NF).fill(null);
+      for (const rec of m0) maps.mce0.xf[xf_index(rec.x, rec.f)] = rec;
+      for (const rec of m1) maps.mce1.xf[xf_index(rec.x, rec.f)] = rec;
+
+      //and then also build cr from xf
+      maps.mce0.cr = new Array(NR*NC).fill(null);
+      maps.mce1.cr = new Array(NR*NC).fill(null);
+      for (const rec of maps.mce0.xf) if (rec) maps.mce0.cr[cr_index(rec.c, rec.r)] = rec;
+      for (const rec of maps.mce1.xf) if (rec) maps.mce1.cr[cr_index(rec.c, rec.r)] = rec;
+
+      make_axes();
+      rebuild_xfcr_grid();
+      status_txt.textContent = "Loaded";
+      update_mask();
+    } catch (e){
+      console.error(e);
+      status_txt.textContent = `Load failed: ${e.message}`;
+    }
+  }
+
+  toggle_mask.addEventListener("change", update_mask);
+
+  which_mce.addEventListener("change", () => {
+    rebuild_xfcr_grid();
+    update_mask();
+  });
+
+  load_mapping();
+</script>
+
+</body>
+</html>
