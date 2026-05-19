@@ -463,6 +463,43 @@
   background: rgba(0,0,0,0.92);
   pointer-events:none;
   }
+
+  /* selected detector styles */
+  .det-cell.selected {
+    box-shadow: inset 0 0 0 2px rgba(0, 150, 255, 0.9), 0 0 6px rgba(0, 150, 255, 0.6) !important;
+  }
+
+  .det-cell.selected::before {
+    content: "✓";
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    background: rgba(0, 150, 255, 0.95);
+    color: white;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: bold;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  /* Drag selection styles */
+  .drag-overlay {
+    position: absolute;
+    border: 2px dashed rgba(0, 150, 255, 0.6);
+    background: rgba(0, 150, 255, 0.1);
+    pointer-events: none;
+    z-index: 100;
+  }
+
+  .det-cell.drag-preview {
+    box-shadow: inset 0 0 0 2px rgba(100, 200, 255, 0.6) !important;
+  }
 </style>
 </head>
 
@@ -495,8 +532,12 @@
     <div style="text-align:center;">
       <h2 style="margin: 0 0 6px;">Detector mapping</h2>
       <p style="margin: 0; opacity: 0.8;">
-        Colored by MUX column. Hover shows corresponding indices. <br>
-        Check the show dead squids box to show which squid is dead from the last tuning <br>
+        Colored by MUX column. Hover shows corresponding indices. <br><br>
+        Click to select a detector, click and drag to select many detectors at once <br>
+        Their indices are copy pastable at the text box to the right of the grids <br>
+        Uncheck the "Sync selected x,f with selected c,r" if you would like to do the selection in each grid independently<br>
+        <br>
+        Check the "Show Dead Squids" box to show which squid is dead from the last tuning <br>
         Note that after a tuning you will need to update the <code>tools/dead_squids.js</code> file manually 
       </p>
     </div>
@@ -512,33 +553,50 @@
       <label style="display:flex; align-items:center; gap:8px;font-weight:600;">
       <input type="checkbox" id="toggle_mask">Show Dead Squids</label>
       <span id="mask_date" style="opacity:0.75; font-size:0.95rem;"></span>
+
+      <label style="display:flex; align-items:center; gap:8px;font-weight:600;">
+      <input type="checkbox" id="sync-selections" checked>Sync selected x,f with selected c,r</label>
     </div>
 
     <div class="grid-card">
 
       <!-- part 1: (x,f) -->
       <div class="card-title">(x, f) focal plane</div>
-      <div class="grid-wrap">
-        <div class="y-axis-label">x</div>
-        <div id="yaxis_xf"></div>
-        <div id="detgrid_xf"></div>
-        <div id="xaxis_xf"></div>
-        <div class="x-axis-label">f</div>
+      <div style="display: flex; gap: 20px; align-items: flex-start;">
+        <div class="grid-wrap">
+          <div class="y-axis-label">x</div>
+          <div id="yaxis_xf"></div>
+          <div id="detgrid_xf"></div>
+          <div id="xaxis_xf"></div>
+          <div class="x-axis-label">f</div>
+        </div>
+        <div style="flex: 0 0 200px; display: flex; flex-direction: column; gap: 10px;">
+          <button id="clear-xf-selection" style="padding: 6px 12px; background: #f0f0f0; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; font-size: 0.9rem;">Clear Selection</button>
+          <div style="font-size: 0.8rem; opacity: 0.7;"> Note these are in order of selection. <br>[(x,f),(x,f)...]</div>
+          <textarea id="xf-indices" readonly style="width: 100%; flex: 1; min-height: 120px; font-family: monospace; font-size: 0.85rem; padding: 8px; border: 1px solid #ccc; border-radius: 4px; resize: none;"></textarea>
+        </div>
       </div>
 
       <div style="height:14px;"></div>
 
       <!-- pat 2: (c,r) -->
       <div class="card-title">(c, r) MUX grid</div>
-      <div class="cr-center">
-        <div class="grid-wrap">
-          <div class="y-axis-label">r</div>
-          <div id="yaxis_cr"></div>
+      <div style="display: flex; gap: 20px; align-items: flex-start;">
+        <div class="cr-center">
+          <div class="grid-wrap">
+            <div class="y-axis-label">r</div>
+            <div id="yaxis_cr"></div>
 
-          <div id="detgrid_cr"></div>
+            <div id="detgrid_cr"></div>
 
-          <div id="xaxis_cr"></div>
-          <div class="x-axis-label">c</div>
+            <div id="xaxis_cr"></div>
+            <div class="x-axis-label">c</div>
+          </div>
+        </div>
+        <div style="flex: 0 0 200px; display: flex; flex-direction: column; gap: 10px;">
+          <button id="clear-cr-selection" style="padding: 6px 12px; background: #f0f0f0; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; font-size: 0.9rem;">Clear Selection</button>
+          <div style="font-size: 0.8rem; opacity: 0.7;">Note these are in order of selection. <br>[(c,r),(c,r)...]</div>
+          <textarea id="cr-indices" readonly style="width: 100%; flex: 1; min-height: 120px; font-family: monospace; font-size: 0.85rem; padding: 8px; border: 1px solid #ccc; border-radius: 4px; resize: none;"></textarea>
         </div>
       </div>
 
@@ -1161,6 +1219,18 @@
 
         //if the box is checked also put the squid dot 
         if (rec && mask_value(mask2d, rec.c, rec.r) === 1){cell.classList.add("masked");}
+        
+        // Add selected class if in selection
+        if (xf_selection.some(s => s.x === x && s.f === f)) {
+          cell.classList.add("selected");
+        }
+        
+        // Add click handler for selection
+        cell.addEventListener("click", (e) => {
+          e.stopPropagation();
+          toggle_xf_selection(x, f);
+        });
+        
         frag.appendChild(cell);
       }
     }
@@ -1187,6 +1257,18 @@
 
         //if the box is checked also put the squid dot 
         if (mask_value(mask2d, c, r) === 1){cell.classList.add("masked");}
+        
+        // Add selected class if in selection
+        if (cr_selection.some(s => s.c === c && s.r === r)) {
+          cell.classList.add("selected");
+        }
+        
+        // Add click handler for selection
+        cell.addEventListener("click", (e) => {
+          e.stopPropagation();
+          toggle_cr_selection(c, r);
+        });
+        
         frag.appendChild(cell);
       }
     }
@@ -1265,6 +1347,10 @@
       rebuild_xfcr_grid();
       status_txt.textContent = "Loaded";
       update_mask();
+      
+      // Setup drag-select after grids are loaded
+      setupDragSelect(detgrid_xf, true);
+      setupDragSelect(detgrid_cr, false);
     } catch (e){
       console.error(e);
       status_txt.textContent = `Load failed: ${e.message}`;
@@ -1277,6 +1363,290 @@
     rebuild_xfcr_grid();
     update_mask();
   });
+
+  // ===== Selection Management =====
+  const xf_selection = [];
+  const cr_selection = [];
+
+  const xf_indices_textbox = document.getElementById("xf-indices");
+  const cr_indices_textbox = document.getElementById("cr-indices");
+  const clear_xf_btn = document.getElementById("clear-xf-selection");
+  const clear_cr_btn = document.getElementById("clear-cr-selection");
+  const sync_toggle = document.getElementById("sync-selections");
+
+  // Auto-select all text on focus
+  [xf_indices_textbox, cr_indices_textbox].forEach(textbox => {
+    textbox.addEventListener("focus", (e) => {
+      e.target.select();
+    });
+  });
+
+  function update_xf_textbox() {
+    if (xf_selection.length === 0) {
+      xf_indices_textbox.value = "";
+    } else {
+      xf_indices_textbox.value = "[" + xf_selection.map(s => `(${s.x},${s.f})`).join(",") + "]";
+    }
+  }
+
+  function update_cr_textbox() {
+    if (cr_selection.length === 0) {
+      cr_indices_textbox.value = "";
+    } else {
+      cr_indices_textbox.value = "[" + cr_selection.map(s => `(${s.c},${s.r})`).join(",") + "]";
+    }
+  }
+
+  function toggle_xf_selection(x, f) {
+    const which = which_mce.value;
+    const xf = maps[which].xf;
+    const rec = xf[xf_index(x, f)];
+    
+    // Check if already selected
+    const idx = xf_selection.findIndex(s => s.x === x && s.f === f);
+    
+    if (idx === -1) {
+      // Add to selection
+      xf_selection.push({ x, f });
+      // If sync is on, also add to cr_selection
+      if (sync_toggle.checked && rec) {
+        const crIdx = cr_selection.findIndex(s => s.c === rec.c && s.r === rec.r);
+        if (crIdx === -1) {
+          cr_selection.push({ c: rec.c, r: rec.r });
+        }
+      }
+    } else {
+      // Remove from selection
+      xf_selection.splice(idx, 1);
+      // If sync is on, also remove from cr_selection
+      if (sync_toggle.checked && rec) {
+        const crIdx = cr_selection.findIndex(s => s.c === rec.c && s.r === rec.r);
+        if (crIdx !== -1) {
+          cr_selection.splice(crIdx, 1);
+        }
+      }
+    }
+    
+    update_xf_textbox();
+    if (sync_toggle.checked) update_cr_textbox();
+    rebuild_xfcr_grid();
+  }
+
+  function toggle_cr_selection(c, r) {
+    const which = which_mce.value;
+    const cr = maps[which].cr;
+    const rec = cr[cr_index(c, r)];
+    
+    // Check if already selected
+    const idx = cr_selection.findIndex(s => s.c === c && s.r === r);
+    
+    if (idx === -1) {
+      // Add to selection
+      cr_selection.push({ c, r });
+      // If sync is on, also add to xf_selection
+      if (sync_toggle.checked && rec) {
+        const xfIdx = xf_selection.findIndex(s => s.x === rec.x && s.f === rec.f);
+        if (xfIdx === -1) {
+          xf_selection.push({ x: rec.x, f: rec.f });
+        }
+      }
+    } else {
+      // Remove from selection
+      cr_selection.splice(idx, 1);
+      // If sync is on, also remove from xf_selection
+      if (sync_toggle.checked && rec) {
+        const xfIdx = xf_selection.findIndex(s => s.x === rec.x && s.f === rec.f);
+        if (xfIdx !== -1) {
+          xf_selection.splice(xfIdx, 1);
+        }
+      }
+    }
+    
+    update_cr_textbox();
+    if (sync_toggle.checked) update_xf_textbox();
+    rebuild_xfcr_grid();
+  }
+
+  clear_xf_btn.addEventListener("click", () => {
+    xf_selection.length = 0;
+    update_xf_textbox();
+    rebuild_xfcr_grid();
+  });
+
+  clear_cr_btn.addEventListener("click", () => {
+    cr_selection.length = 0;
+    update_cr_textbox();
+    rebuild_xfcr_grid();
+  });
+
+  // ===== Drag-to-Select =====
+  let dragState = null;
+
+  function getCellsInRectangle(grid, startX, startY, endX, endY) {
+    const cells = [];
+    const allCells = grid.querySelectorAll(".det-cell");
+    
+    allCells.forEach(cell => {
+      const rect = cell.getBoundingClientRect();
+      const gridRect = grid.getBoundingClientRect();
+      
+      const cellLeft = rect.left - gridRect.left;
+      const cellTop = rect.top - gridRect.top;
+      const cellRight = cellLeft + rect.width;
+      const cellBottom = cellTop + rect.height;
+      
+      // Check if cell intersects with drag rectangle
+      const minX = Math.min(startX, endX);
+      const maxX = Math.max(startX, endX);
+      const minY = Math.min(startY, endY);
+      const maxY = Math.max(startY, endY);
+      
+      if (cellRight >= minX && cellLeft <= maxX && cellBottom >= minY && cellTop <= maxY) {
+        cells.push(cell);
+      }
+    });
+    
+    return cells;
+  }
+
+  function setupDragSelect(gridElement, isXF) {
+    let overlay = null;
+    
+    gridElement.addEventListener("mousedown", (e) => {
+      if (!e.target.classList.contains("det-cell")) return; // Only start drag on detector buttons
+      
+      dragState = {
+        startX: e.clientX,
+        startY: e.clientY,
+        isXF: isXF,
+        grid: gridElement,
+        isDragging: false
+      };
+      
+      e.preventDefault();
+    });
+    
+    document.addEventListener("mousemove", (e) => {
+      if (!dragState || dragState.isXF !== isXF) return;
+      
+      const gridRect = dragState.grid.getBoundingClientRect();
+      const startX = dragState.startX - gridRect.left;
+      const startY = dragState.startY - gridRect.top;
+      const currentX = e.clientX - gridRect.left;
+      const currentY = e.clientY - gridRect.top;
+      
+      const distance = Math.sqrt(Math.pow(currentX - startX, 2) + Math.pow(currentY - startY, 2));
+      
+      // Only start dragging if moved more than 5 pixels
+      if (distance > 5) {
+        dragState.isDragging = true;
+      }
+      
+      if (!dragState.isDragging) return;
+      
+      // Create overlay on first drag
+      if (!overlay) {
+        overlay = document.createElement("div");
+        overlay.className = "drag-overlay";
+        dragState.grid.style.position = "relative";
+        dragState.grid.appendChild(overlay);
+      }
+      
+      const minX = Math.min(startX, currentX);
+      const minY = Math.min(startY, currentY);
+      const width = Math.abs(currentX - startX);
+      const height = Math.abs(currentY - startY);
+      
+      if (overlay) {
+        overlay.style.left = minX + "px";
+        overlay.style.top = minY + "px";
+        overlay.style.width = width + "px";
+        overlay.style.height = height + "px";
+      }
+      
+      // Highlight cells in rectangle
+      const cellsInRect = getCellsInRectangle(dragState.grid, startX, startY, currentX, currentY);
+      dragState.grid.querySelectorAll(".det-cell").forEach(cell => {
+        cell.classList.remove("drag-preview");
+      });
+      cellsInRect.forEach(cell => {
+        cell.classList.add("drag-preview");
+      });
+    });
+    
+    document.addEventListener("mouseup", (e) => {
+      if (!dragState || dragState.isXF !== isXF) return;
+      
+      if (dragState.isDragging) {
+        const gridRect = dragState.grid.getBoundingClientRect();
+        const startX = dragState.startX - gridRect.left;
+        const startY = dragState.startY - gridRect.top;
+        const endX = e.clientX - gridRect.left;
+        const endY = e.clientY - gridRect.top;
+        
+        const cellsInRect = getCellsInRectangle(dragState.grid, startX, startY, endX, endY);
+        
+        cellsInRect.forEach(cell => {
+          if (isXF) {
+            const x = Number(cell.dataset.x);
+            const f = Number(cell.dataset.f);
+            const idx = xf_selection.findIndex(s => s.x === x && s.f === f);
+            if (idx === -1) {
+              xf_selection.push({ x, f });
+              // If sync is on, also add to cr_selection
+              if (sync_toggle.checked) {
+                const which = which_mce.value;
+                const rec = maps[which].xf[xf_index(x, f)];
+                if (rec) {
+                  const crIdx = cr_selection.findIndex(s => s.c === rec.c && s.r === rec.r);
+                  if (crIdx === -1) {
+                    cr_selection.push({ c: rec.c, r: rec.r });
+                  }
+                }
+              }
+            }
+          } else {
+            const c = Number(cell.dataset.c);
+            const r = Number(cell.dataset.r);
+            const idx = cr_selection.findIndex(s => s.c === c && s.r === r);
+            if (idx === -1) {
+              cr_selection.push({ c, r });
+              // If sync is on, also add to xf_selection
+              if (sync_toggle.checked) {
+                const which = which_mce.value;
+                const rec = maps[which].cr[cr_index(c, r)];
+                if (rec) {
+                  const xfIdx = xf_selection.findIndex(s => s.x === rec.x && s.f === rec.f);
+                  if (xfIdx === -1) {
+                    xf_selection.push({ x: rec.x, f: rec.f });
+                  }
+                }
+              }
+            }
+          }
+        });
+        
+        if (isXF) {
+          update_xf_textbox();
+          if (sync_toggle.checked) update_cr_textbox();
+        } else {
+          update_cr_textbox();
+          if (sync_toggle.checked) update_xf_textbox();
+        }
+        rebuild_xfcr_grid();
+      }
+      
+      // Clean up
+      if (overlay && overlay.parentNode) {
+        overlay.parentNode.removeChild(overlay);
+      }
+      dragState.grid.querySelectorAll(".det-cell").forEach(cell => {
+        cell.classList.remove("drag-preview");
+      });
+      dragState = null;
+      overlay = null;
+    });
+  }
 
   load_mapping();
 </script>
