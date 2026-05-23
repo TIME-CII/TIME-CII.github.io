@@ -6,8 +6,109 @@
 <title>TIME | Detectors</title>
 <link rel="stylesheet" href="style.css" />
 <script src="script.js" defer></script>
+<script>
+  if (sessionStorage.getItem('timeToolsUnlocked') === 'true') {
+    document.documentElement.classList.add('time-tools-unlocked');
+  } else {
+    document.documentElement.classList.add('time-tools-locked');
+  }
+</script>
 
 <style>
+  html.time-tools-locked body > header,
+  html.time-tools-locked body > main,
+  html.time-tools-locked body > footer,
+  html.time-tools-locked body > #globalTooltip {
+    visibility: hidden;
+  }
+
+  html.time-tools-locked body {
+    overflow: hidden;
+  }
+
+  .auth-overlay {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background:
+      radial-gradient(circle at top, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.92) 45%, rgba(232, 238, 242, 0.98)),
+      linear-gradient(135deg, rgba(12, 23, 36, 0.14), rgba(25, 60, 98, 0.08));
+    z-index: 1000000;
+  }
+
+  html.time-tools-locked .auth-overlay {
+    display: flex;
+  }
+
+  .auth-card {
+    width: min(100%, 420px);
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.96);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 30px 80px rgba(15, 23, 42, 0.18);
+    padding: 28px;
+    backdrop-filter: blur(10px);
+  }
+
+  .auth-card h1 {
+    margin: 0 0 8px;
+    font-size: 1.9rem;
+  }
+
+  .auth-card p {
+    margin: 0 0 18px;
+    color: rgba(0, 0, 0, 0.68);
+    line-height: 1.5;
+  }
+
+  .auth-form {
+    display: grid;
+    gap: 14px;
+  }
+
+  .auth-form label {
+    display: grid;
+    gap: 6px;
+    font-weight: 600;
+    color: rgba(0, 0, 0, 0.82);
+  }
+
+  .auth-form input {
+    border: 1px solid rgba(0, 0, 0, 0.14);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 1rem;
+    font-family: inherit;
+    background: white;
+  }
+
+  .auth-form button {
+    border: none;
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    color: white;
+    background: linear-gradient(135deg, #0b4f7a, #1d7fbf);
+  }
+
+  .auth-error {
+    min-height: 1.2em;
+    color: #b42318;
+    font-weight: 600;
+  }
+
+  html.time-tools-unlocked body > header,
+  html.time-tools-unlocked body > main,
+  html.time-tools-unlocked body > footer,
+  html.time-tools-unlocked body > #globalTooltip {
+    visibility: visible;
+  }
+
   :root{--cell: 15px;--gap: 2px;--ylabel: 28px;--ycol: 46px;--xaxis: 28px;--xlabel: 22px;}
   body { margin: 0; overflow-x: hidden; }
   main { max-width: none !important;  overflow: visible; }
@@ -504,6 +605,24 @@
 </head>
 
 <body>
+<div class="auth-overlay" id="authOverlay" aria-modal="true" role="dialog" aria-labelledby="authTitle">
+  <div class="auth-card">
+    <h1 id="authTitle">TIME Tools Access</h1>
+    <p>Enter the TIME credentials to continue.</p>
+    <form id="authForm" class="auth-form">
+      <label>
+        Username
+        <input id="authUsername" type="text" autocomplete="username" required />
+      </label>
+      <label>
+        Password
+        <input id="authPassword" type="password" autocomplete="current-password" required />
+      </label>
+      <button type="submit">Unlock</button>
+      <div id="authError" class="auth-error" aria-live="polite"></div>
+    </form>
+  </div>
+</div>
 <header class="nav-shell">
   <a href="index.html"><img src="images/TIME_logo.png" alt="TIME" class="brand-logo"></a>
   <nav>
@@ -657,6 +776,49 @@
 
 <script src="./tools/dead_squids.js"></script>
 <script>
+  const authOverlay = document.getElementById('authOverlay');
+  const authForm = document.getElementById('authForm');
+  const authUsername = document.getElementById('authUsername');
+  const authPassword = document.getElementById('authPassword');
+  const authError = document.getElementById('authError');
+  const AUTH_USERNAME = 'time';
+  const AUTH_PASSWORD = 'CII@zof7';
+
+  function unlockTimeTools() {
+    sessionStorage.setItem('timeToolsUnlocked', 'true');
+    document.documentElement.classList.remove('time-tools-locked');
+    document.documentElement.classList.add('time-tools-unlocked');
+    if (authOverlay) {
+      authOverlay.remove();
+    }
+  }
+
+  function showAuthError(message) {
+    if (authError) {
+      authError.textContent = message;
+    }
+  }
+
+  if (sessionStorage.getItem('timeToolsUnlocked') === 'true') {
+    unlockTimeTools();
+  }
+
+  if (authForm) {
+    authForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+
+      if (authUsername.value === AUTH_USERNAME && authPassword.value === AUTH_PASSWORD) {
+        showAuthError('');
+        unlockTimeTools();
+      } else {
+        sessionStorage.removeItem('timeToolsUnlocked');
+        showAuthError('Incorrect username or password.');
+        authPassword.value = '';
+        authPassword.focus();
+      }
+    });
+  }
+
   // Tab switching functionality
   const tabButtons = document.querySelectorAll('.tab-button');
   const tabContents = document.querySelectorAll('.tab-content');
