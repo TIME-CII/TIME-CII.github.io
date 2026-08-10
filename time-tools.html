@@ -601,6 +601,180 @@
   .det-cell.drag-preview {
     box-shadow: inset 0 0 0 2px rgba(100, 200, 255, 0.6) !important;
   }
+
+  /* ===== Leak Rate Calculator styles ===== */
+  .leak-panel { max-width: 900px; margin: 0 auto; }
+
+  .lr-card{
+    border-radius: 18px;
+    border: 1px solid rgba(0,0,0,0.08);
+    background: rgba(255,255,255,0.9);
+    padding: 18px 22px;
+    margin: 0 auto 18px;
+    max-width: 720px;
+  }
+  .lr-card h3{
+    margin: 0 0 14px;
+    font-family: 'Roboto', sans-serif;
+    opacity: 0.9;
+  }
+  .lr-row{
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  .lr-row label{
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    flex: 1;
+    min-width: 190px;
+  }
+  .lr-row input{
+    padding: 9px 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(0,0,0,0.18);
+    font-size: 0.95rem;
+    font-family: inherit;
+  }
+  .lr-geom-select{
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+  .lr-geom-select label{
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+  }
+  .lr-geom-panel{
+    display: flex;
+    gap: 22px;
+    flex-wrap: wrap;
+  }
+  .lr-geom-panel label{
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 0.88rem;
+    font-weight: 600;
+  }
+  .lr-dim-group{
+    display: flex;
+    gap: 6px;
+  }
+  .lr-dim-group input{
+    width: 110px;
+    padding: 9px 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(0,0,0,0.18);
+    font-family: inherit;
+    font-size: 0.95rem;
+  }
+  .lr-dim-group select{
+    padding: 9px 8px;
+    border-radius: 8px;
+    border: 1px solid rgba(0,0,0,0.18);
+    font-family: inherit;
+    font-size: 0.9rem;
+    background: white;
+  }
+  #lr_calculate{
+    display: block;
+    margin: 4px auto 22px;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: white;
+    cursor: pointer;
+    background: linear-gradient(135deg, #0b4f7a, #1d7fbf);
+  }
+  #lr_calculate:hover{ filter: brightness(1.06); }
+
+  .lr-results{ max-width: 720px; margin: 0 auto 40px; }
+  .lr-summary{
+    margin-top: 14px;
+    padding: 18px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, rgba(11,79,122,0.08), rgba(29,127,191,0.08));
+    border: 1px solid rgba(11,79,122,0.2);
+    text-align: center;
+  }
+  .lr-summary .lr-summary-label{ font-size: 0.85rem; opacity: 0.7; margin-bottom: 4px; }
+  .lr-summary .lr-summary-value{ font-size: 1.7rem; font-weight: 800; color: #0b4f7a; }
+  .lr-summary .lr-summary-alt{ font-size: 0.9rem; opacity: 0.65; margin-top: 6px; }
+  .lr-toggle-details{
+    display: block;
+    margin: 14px auto 0;
+    padding: 10px 18px;
+    border: 1px solid rgba(11,79,122,0.22);
+    border-radius: 999px;
+    background: white;
+    color: #0b4f7a;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .lr-toggle-details:hover{ filter: brightness(0.98); }
+  .lr-details{
+    margin-top: 12px;
+    padding-top: 8px;
+  }
+  .lr-section-title{
+    font-weight: 700;
+    margin: 18px 4px 4px;
+    opacity: 0.85;
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.95rem;
+  }
+  .lr-step{
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+    padding: 7px 4px;
+    border-bottom: 1px dashed rgba(0,0,0,0.12);
+    font-size: 0.92rem;
+  }
+  .lr-step .lr-label{ opacity: 0.72; }
+  .lr-step .lr-value{
+    font-family: 'SFMono-Regular', Consolas, monospace;
+    font-weight: 600;
+    text-align: right;
+    white-space: nowrap;
+  }
+  .lr-note{
+    font-size: 0.82rem;
+    opacity: 0.65;
+    padding: 4px 4px 0;
+  }
+  .lr-final{
+    margin-top: 18px;
+    padding: 18px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, rgba(11,79,122,0.08), rgba(29,127,191,0.08));
+    border: 1px solid rgba(11,79,122,0.2);
+    text-align: center;
+  }
+  .lr-final .lr-final-label{ font-size: 0.85rem; opacity: 0.7; margin-bottom: 4px; }
+  .lr-final .lr-final-value{ font-size: 1.7rem; font-weight: 800; color: #0b4f7a; }
+  .lr-final .lr-final-alt{ font-size: 0.9rem; opacity: 0.65; margin-top: 6px; }
+  .lr-error{
+    color: #b42318;
+    font-weight: 700;
+    text-align: center;
+    padding: 14px;
+    max-width: 720px;
+    margin: 0 auto;
+  }
 </style>
 </head>
 
@@ -641,6 +815,7 @@
   <div class="tab-nav">
     <button class="tab-button active" data-tab="detector-mapping">Detector Mapping</button>
     <button class="tab-button" data-tab="computer-rack">Computer Rack</button>
+    <button class="tab-button" data-tab="leak-rate">Leak Rate Calculator</button>
   </div>
 
   <!-- Detector Mapping Tab -->
@@ -764,6 +939,124 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- Leak Rate Calculator Tab -->
+  <div id="leak-rate" class="tab-content">
+    <section class="panel leak-panel">
+
+      <div style="text-align:center;">
+        <h2 style="margin: 0 0 6px;">Leak rate calculator</h2>
+        <p style="margin: 0; opacity: 0.8;">
+          Enter the start/end time and pressure exactly as read off the gauge, pick a volume geometry
+          (or enter the volume directly), and every intermediate step will be shown with units.
+        </p>
+      </div>
+
+      <div class="lr-card">
+        <h3>Pressure readings</h3>
+        <div class="lr-row">
+          <label>Start time (HH:MM:SS)
+            <input type="time" id="lr_start_time" step="1">
+          </label>
+          <label>Start pressure (torr)
+            <input type="number" id="lr_start_pressure" step="any" placeholder="e.g. 0.004204">
+          </label>
+        </div>
+        <div class="lr-row">
+          <label>End time (HH:MM:SS)
+            <input type="time" id="lr_end_time" step="1">
+          </label>
+          <label>End pressure (torr)
+            <input type="number" id="lr_end_pressure" step="any" placeholder="e.g. 0.004445">
+          </label>
+        </div>
+      </div>
+
+      <div class="lr-card">
+        <h3>Volume</h3>
+        <div class="lr-geom-select">
+          <label><input type="radio" name="lr_geom" value="cylinder" checked> Cylinder</label>
+          <label><input type="radio" name="lr_geom" value="rect"> Rectangular box</label>
+          <label><input type="radio" name="lr_geom" value="direct"> Enter volume directly</label>
+        </div>
+
+        <div id="lr_geom_cylinder" class="lr-geom-panel">
+          <label>Diameter
+            <div class="lr-dim-group">
+              <input type="number" id="lr_cyl_d" step="any" placeholder="e.g. 30">
+              <select id="lr_cyl_d_unit">
+                <option value="cm">cm</option>
+                <option value="in">in</option>
+                <option value="m">m</option>
+              </select>
+            </div>
+          </label>
+          <label>Length
+            <div class="lr-dim-group">
+              <input type="number" id="lr_cyl_l" step="any" placeholder="e.g. 60">
+              <select id="lr_cyl_l_unit">
+                <option value="cm">cm</option>
+                <option value="in">in</option>
+                <option value="m">m</option>
+              </select>
+            </div>
+          </label>
+        </div>
+
+        <div id="lr_geom_rect" class="lr-geom-panel" style="display:none;">
+          <label>Length
+            <div class="lr-dim-group">
+              <input type="number" id="lr_rect_l" step="any" placeholder="e.g. 50">
+              <select id="lr_rect_l_unit">
+                <option value="cm">cm</option>
+                <option value="in">in</option>
+                <option value="m">m</option>
+              </select>
+            </div>
+          </label>
+          <label>Width
+            <div class="lr-dim-group">
+              <input type="number" id="lr_rect_w" step="any" placeholder="e.g. 40">
+              <select id="lr_rect_w_unit">
+                <option value="cm">cm</option>
+                <option value="in">in</option>
+                <option value="m">m</option>
+              </select>
+            </div>
+          </label>
+          <label>Height
+            <div class="lr-dim-group">
+              <input type="number" id="lr_rect_h" step="any" placeholder="e.g. 30">
+              <select id="lr_rect_h_unit">
+                <option value="cm">cm</option>
+                <option value="in">in</option>
+                <option value="m">m</option>
+              </select>
+            </div>
+          </label>
+        </div>
+
+        <div id="lr_geom_direct" class="lr-geom-panel" style="display:none;">
+          <label>Volume
+            <div class="lr-dim-group">
+              <input type="number" id="lr_vol_direct" step="any" placeholder="e.g. 420">
+              <select id="lr_vol_direct_unit">
+                <option value="L">L</option>
+                <option value="m3">m³</option>
+                <option value="mL">mL</option>
+                <option value="ft3">ft³</option>
+              </select>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <button id="lr_calculate" type="button">Calculate leak rate</button>
+
+      <div id="lr_results" class="lr-results"></div>
+
+    </section>
   </div>
 
 </main>
@@ -1631,13 +1924,21 @@
 
   clear_xf_btn.addEventListener("click", () => {
     xf_selection.length = 0;
+    if (sync_toggle.checked) {
+      cr_selection.length = 0;
+    }
     update_xf_textbox();
+    if (sync_toggle.checked) update_cr_textbox();
     rebuild_xfcr_grid();
   });
 
   clear_cr_btn.addEventListener("click", () => {
     cr_selection.length = 0;
+    if (sync_toggle.checked) {
+      xf_selection.length = 0;
+    }
     update_cr_textbox();
+    if (sync_toggle.checked) update_xf_textbox();
     rebuild_xfcr_grid();
   });
 
@@ -1811,6 +2112,227 @@
   }
 
   load_mapping();
+</script>
+
+<script>
+  // ===== Leak Rate Calculator =====
+  (function(){
+    const TORR_TO_MBAR = 1.33322368; // 1 torr = 1.33322368 mbar
+    const IN_TO_M = 0.0254;
+    const FT3_TO_M3 = 0.0283168466;
+
+    const geomRadios = document.querySelectorAll('input[name="lr_geom"]');
+    const geomPanels = {
+      cylinder: document.getElementById('lr_geom_cylinder'),
+      rect: document.getElementById('lr_geom_rect'),
+      direct: document.getElementById('lr_geom_direct'),
+    };
+
+    function showGeomPanel(which){
+      Object.entries(geomPanels).forEach(([key, el]) => {
+        if (!el) return;
+        el.style.display = (key === which) ? 'flex' : 'none';
+      });
+    }
+    showGeomPanel('cylinder');
+
+    geomRadios.forEach(r => {
+      r.addEventListener('change', () => { if (r.checked) showGeomPanel(r.value); });
+    });
+
+    function toMeters(value, unit){
+      if (unit === 'cm') return value / 100;
+      if (unit === 'in') return value * IN_TO_M;
+      return value; // 'm'
+    }
+
+    // format a number for display: reasonable sig figs, switches to
+    // scientific notation for very small/large magnitudes
+    function fmt(x, sig){
+      sig = sig || 6;
+      if (x === null || x === undefined || !isFinite(x)) return "—";
+      if (x === 0) return "0";
+      const abs = Math.abs(x);
+      if (abs < 1e-4 || abs >= 1e6) return x.toExponential(4);
+      return Number(x.toPrecision(sig)).toString();
+    }
+
+    function stepRow(label, value){
+      return '<div class="lr-step"><span class="lr-label">' + label + '</span><span class="lr-value">' + value + '</span></div>';
+    }
+
+    function parseTimeToSeconds(str){
+      const parts = str.split(':').map(Number);
+      const h = parts[0] || 0, m = parts[1] || 0, s = parts[2] || 0;
+      return { h: h, m: m, s: s, total: h * 3600 + m * 60 + s };
+    }
+
+    const calcBtn = document.getElementById('lr_calculate');
+    if (!calcBtn) return;
+
+    calcBtn.addEventListener('click', () => {
+      const resultsEl = document.getElementById('lr_results');
+      resultsEl.innerHTML = '';
+
+      const startTimeStr = document.getElementById('lr_start_time').value;
+      const endTimeStr = document.getElementById('lr_end_time').value;
+      const p1 = parseFloat(document.getElementById('lr_start_pressure').value);
+      const p2 = parseFloat(document.getElementById('lr_end_pressure').value);
+
+      if (!startTimeStr || !endTimeStr || isNaN(p1) || isNaN(p2)) {
+        resultsEl.innerHTML = '<div class="lr-error">Please fill in the start time, end time, start pressure, and end pressure.</div>';
+        return;
+      }
+
+      const t1 = parseTimeToSeconds(startTimeStr);
+      const t2 = parseTimeToSeconds(endTimeStr);
+
+      if (t1.total === t2.total) {
+        resultsEl.innerHTML = '<div class="lr-error">Start time and end time are identical — cannot compute a rate over zero elapsed time.</div>';
+        return;
+      }
+
+      let durationSec = t2.total - t1.total;
+      let crossedMidnight = false;
+      if (durationSec < 0) {
+        durationSec += 24 * 3600;
+        crossedMidnight = true;
+      }
+
+      // ---- Volume ----
+      const geom = document.querySelector('input[name="lr_geom"]:checked').value;
+      let volM3 = null;
+      let volSteps = '';
+
+      if (geom === 'cylinder') {
+        const dVal = parseFloat(document.getElementById('lr_cyl_d').value);
+        const dUnit = document.getElementById('lr_cyl_d_unit').value;
+        const lVal = parseFloat(document.getElementById('lr_cyl_l').value);
+        const lUnit = document.getElementById('lr_cyl_l_unit').value;
+        if (isNaN(dVal) || isNaN(lVal)) {
+          resultsEl.innerHTML = '<div class="lr-error">Please enter both the diameter and the length of the cylinder.</div>';
+          return;
+        }
+        const d_m = toMeters(dVal, dUnit);
+        const l_m = toMeters(lVal, lUnit);
+        const r_m = d_m / 2;
+        volM3 = Math.PI * r_m * r_m * l_m;
+        volSteps =
+          stepRow('Diameter', fmt(dVal) + ' ' + dUnit + ' = ' + fmt(d_m) + ' m') +
+          stepRow('Radius = diameter / 2', fmt(r_m) + ' m') +
+          stepRow('Length', fmt(lVal) + ' ' + lUnit + ' = ' + fmt(l_m) + ' m') +
+          stepRow('Volume = π · r² · L', fmt(volM3) + ' m³');
+      } else if (geom === 'rect') {
+        const lVal = parseFloat(document.getElementById('lr_rect_l').value);
+        const lUnit = document.getElementById('lr_rect_l_unit').value;
+        const wVal = parseFloat(document.getElementById('lr_rect_w').value);
+        const wUnit = document.getElementById('lr_rect_w_unit').value;
+        const hVal = parseFloat(document.getElementById('lr_rect_h').value);
+        const hUnit = document.getElementById('lr_rect_h_unit').value;
+        if (isNaN(lVal) || isNaN(wVal) || isNaN(hVal)) {
+          resultsEl.innerHTML = '<div class="lr-error">Please enter the length, width, and height of the box.</div>';
+          return;
+        }
+        const l_m = toMeters(lVal, lUnit);
+        const w_m = toMeters(wVal, wUnit);
+        const h_m = toMeters(hVal, hUnit);
+        volM3 = l_m * w_m * h_m;
+        volSteps =
+          stepRow('Length', fmt(lVal) + ' ' + lUnit + ' = ' + fmt(l_m) + ' m') +
+          stepRow('Width', fmt(wVal) + ' ' + wUnit + ' = ' + fmt(w_m) + ' m') +
+          stepRow('Height', fmt(hVal) + ' ' + hUnit + ' = ' + fmt(h_m) + ' m') +
+          stepRow('Volume = L · W · H', fmt(volM3) + ' m³');
+      } else {
+        const vVal = parseFloat(document.getElementById('lr_vol_direct').value);
+        const vUnit = document.getElementById('lr_vol_direct_unit').value;
+        if (isNaN(vVal)) {
+          resultsEl.innerHTML = '<div class="lr-error">Please enter a volume.</div>';
+          return;
+        }
+        if (vUnit === 'L') volM3 = vVal / 1000;
+        else if (vUnit === 'mL') volM3 = vVal / 1e6;
+        else if (vUnit === 'ft3') volM3 = vVal * FT3_TO_M3;
+        else volM3 = vVal; // m3
+        volSteps =
+          stepRow('Entered volume', fmt(vVal) + ' ' + vUnit) +
+          stepRow('Volume', fmt(volM3) + ' m³');
+      }
+
+      if (!(volM3 > 0)) {
+        resultsEl.innerHTML = '<div class="lr-error">Volume must be greater than zero.</div>';
+        return;
+      }
+
+      const volL = volM3 * 1000;
+
+      const deltaP = p2 - p1; // torr
+      const slopeTorrPerSec = deltaP / durationSec;
+      const slopeMbarPerSec = slopeTorrPerSec * TORR_TO_MBAR;
+
+      const leakRateMbarL = volL * slopeMbarPerSec;
+      const leakRateTorrL = volL * slopeTorrPerSec;
+
+      const durH = Math.floor(durationSec / 3600);
+      const durM = Math.floor((durationSec % 3600) / 60);
+      const durS = Math.floor(durationSec % 60);
+
+      let detailsHtml = '';
+
+      detailsHtml += '<div class="lr-section-title">Elapsed time</div>';
+      detailsHtml += stepRow('Start time', startTimeStr);
+      detailsHtml += stepRow('End time', endTimeStr);
+      if (crossedMidnight) {
+        detailsHtml += '<div class="lr-note">End time is earlier than start time — assumed the run crossed midnight (+24h).</div>';
+      }
+      detailsHtml += stepRow('Duration (H:M:S)', durH + 'h ' + durM + 'm ' + durS + 's');
+      detailsHtml += stepRow('Duration in seconds', fmt(durationSec) + ' s');
+
+      detailsHtml += '<div class="lr-section-title">Pressure change</div>';
+      detailsHtml += stepRow('Start pressure', fmt(p1) + ' torr');
+      detailsHtml += stepRow('End pressure', fmt(p2) + ' torr');
+      detailsHtml += stepRow('ΔP = P_end − P_start', fmt(deltaP) + ' torr');
+
+      detailsHtml += '<div class="lr-section-title">Pressure rise rate</div>';
+      detailsHtml += stepRow('Slope = ΔP / duration', fmt(slopeTorrPerSec) + ' torr/s');
+      detailsHtml += stepRow('Slope × 1.33322368 (torr → mbar)', fmt(slopeMbarPerSec) + ' mbar/s');
+
+      detailsHtml += '<div class="lr-section-title">Volume</div>';
+      detailsHtml += volSteps;
+      detailsHtml += stepRow('Volume × 1000 (m³ → L)', fmt(volL) + ' L');
+
+      const summaryHtml =
+        '<div class="lr-summary">' +
+          '<div class="lr-summary-label">Leak rate</div>' +
+          '<div class="lr-summary-value">' + fmt(leakRateMbarL) + ' mbar·L/s</div>' +
+          '<div class="lr-summary-alt">= ' + fmt(leakRateTorrL) + ' torr·L/s</div>' +
+        '</div>';
+
+      resultsEl.innerHTML =
+        summaryHtml +
+        '<button id="lr_toggle_details" class="lr-toggle-details" type="button" aria-expanded="false">Show details</button>' +
+        '<div id="lr_details" class="lr-details" hidden>' +
+          detailsHtml +
+        '</div>';
+
+      const toggleDetailsBtn = document.getElementById('lr_toggle_details');
+      const detailsEl = document.getElementById('lr_details');
+
+      if (toggleDetailsBtn && detailsEl) {
+        toggleDetailsBtn.addEventListener('click', () => {
+          const isHidden = detailsEl.hasAttribute('hidden');
+          if (isHidden) {
+            detailsEl.removeAttribute('hidden');
+            toggleDetailsBtn.textContent = 'Hide details';
+            toggleDetailsBtn.setAttribute('aria-expanded', 'true');
+          } else {
+            detailsEl.setAttribute('hidden', '');
+            toggleDetailsBtn.textContent = 'Show details';
+            toggleDetailsBtn.setAttribute('aria-expanded', 'false');
+          }
+        });
+      }
+    });
+  })();
 </script>
 
 </body>
