@@ -654,6 +654,87 @@
     gap: 6px;
     cursor: pointer;
   }
+  .lr-known-panel{
+    display: block;
+  }
+  .lr-known-shell{
+    display: block;
+  }
+  .lr-known-note{
+    display: block;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    max-width: 220px;
+    padding: 0 2px;
+    margin: 0 0 12px;
+  }
+  .lr-known-note strong{
+    color: #0b4f7a;
+  }
+  .lr-known-note em{
+    font-style: italic;
+    font-weight: 700;
+  }
+  .lr-known-layout{
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 260px;
+    gap: 14px;
+    align-items: start;
+  }
+  .lr-known-grid{
+    min-width: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+  .lr-known-item{
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,0.12);
+    background: rgba(255,255,255,0.9);
+    cursor: pointer;
+  }
+  .lr-known-item input{
+    margin-top: 3px;
+    width: 16px;
+    height: 16px;
+    flex: 0 0 auto;
+  }
+  .lr-known-item strong{
+    display: block;
+    color: rgba(0,0,0,0.88);
+  }
+  .lr-known-item span{
+    display: block;
+    font-size: 0.9rem;
+    opacity: 0.75;
+    margin-top: 2px;
+  }
+  .lr-known-total{
+    width: 260px;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: baseline;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(11,79,122,0.08), rgba(29,127,191,0.08));
+    border: 1px solid rgba(11,79,122,0.18);
+    font-weight: 700;
+    position: sticky;
+    top: 12px;
+  }
+  .lr-known-total .lr-known-total-label{
+    opacity: 0.75;
+  }
+  .lr-known-total .lr-known-total-value{
+    font-family: 'SFMono-Regular', Consolas, monospace;
+    font-size: 1rem;
+    text-align: right;
+  }
   .lr-geom-panel{
     display: flex;
     gap: 22px;
@@ -979,6 +1060,7 @@
           <label><input type="radio" name="lr_geom" value="cylinder" checked> Cylinder</label>
           <label><input type="radio" name="lr_geom" value="rect"> Rectangular box</label>
           <label><input type="radio" name="lr_geom" value="direct"> Enter volume directly</label>
+          <label><input type="radio" name="lr_geom" value="known"> Known Volumes</label>
         </div>
 
         <div id="lr_geom_cylinder" class="lr-geom-panel">
@@ -1049,6 +1131,34 @@
               </select>
             </div>
           </label>
+        </div>
+
+        <div id="lr_geom_known" class="lr-known-panel" style="display:none;">
+          <div class="lr-known-note">
+            <strong>Known volumes are only used for order-of-magnitude estimates.</strong>
+            These values can change depending on the exact setup, so for anything complex, re-estimate the volumes before using them.
+            <em>Last updated 2025.</em>
+          </div>
+
+          <div class="lr-known-layout">
+            <div class="lr-known-grid">
+              <label class="lr-known-item"><input type="checkbox" class="lr-known-check" data-vol-m3="0.42"><div><strong>Cryostats vacuum shell</strong><span>420 Liters</span></div></label>
+              <label class="lr-known-item"><input type="checkbox" class="lr-known-check" data-vol-m3="0.108"><div><strong>JT Tank volume</strong><span>108000 cm cubed</span></div></label>
+              <label class="lr-known-item"><input type="checkbox" class="lr-known-check" data-vol-m3="0.00027502"><div><strong>Tank to V0</strong><span>275.02 cm cubed</span></div></label>
+              <label class="lr-known-item"><input type="checkbox" class="lr-known-check" data-vol-m3="0.00366429"><div><strong>V0 to external pump</strong><span>3664.29 cm cubed</span></div></label>
+              <label class="lr-known-item"><input type="checkbox" class="lr-known-check" data-vol-m3="0.00071266"><div><strong>JT to Cold Trap to V8</strong><span>712.66 cm cubed</span></div></label>
+              <label class="lr-known-item"><input type="checkbox" class="lr-known-check" data-vol-m3="0.00000733"><div><strong>Cold Trap Bypass line</strong><span>7.33 cm cubed</span></div></label>
+              <label class="lr-known-item"><input type="checkbox" class="lr-known-check" data-vol-m3="0.00041281"><div><strong>V8 to cryo top injection</strong><span>412.81 cm cubed</span></div></label>
+              <label class="lr-known-item"><input type="checkbox" class="lr-known-check" data-vol-m3="0.00015014"><div><strong>JT Turbo to Mechanical pump</strong><span>150.14 cm cubed</span></div></label>
+              <label class="lr-known-item"><input type="checkbox" class="lr-known-check" data-vol-m3="0.00073652"><div><strong>Mech pump to JT</strong><span>736.52 cm cubed</span></div></label>
+              <label class="lr-known-item"><input type="checkbox" class="lr-known-check" data-vol-m3="0.00331243"><div><strong>Cryo top Pump to Turbo</strong><span>3312.43 cm cubed</span></div></label>
+            </div>
+
+            <div class="lr-known-total">
+              <div class="lr-known-total-label">Selected total</div>
+              <div id="lr_known_total" class="lr-known-total-value">0 m³</div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -2126,6 +2236,7 @@
       cylinder: document.getElementById('lr_geom_cylinder'),
       rect: document.getElementById('lr_geom_rect'),
       direct: document.getElementById('lr_geom_direct'),
+      known: document.getElementById('lr_geom_known'),
     };
 
     function showGeomPanel(which){
@@ -2139,6 +2250,27 @@
     geomRadios.forEach(r => {
       r.addEventListener('change', () => { if (r.checked) showGeomPanel(r.value); });
     });
+
+    const knownChecks = document.querySelectorAll('.lr-known-check');
+    const knownTotalEl = document.getElementById('lr_known_total');
+
+    function updateKnownTotal() {
+      let totalM3 = 0;
+      knownChecks.forEach((checkbox) => {
+        if (checkbox.checked) {
+          totalM3 += Number(checkbox.dataset.volM3 || 0);
+        }
+      });
+      if (knownTotalEl) {
+        knownTotalEl.textContent = fmt(totalM3) + ' m³';
+      }
+      return totalM3;
+    }
+
+    knownChecks.forEach((checkbox) => {
+      checkbox.addEventListener('change', updateKnownTotal);
+    });
+    updateKnownTotal();
 
     function toMeters(value, unit){
       if (unit === 'cm') return value / 100;
@@ -2243,19 +2375,33 @@
           stepRow('Height', fmt(hVal) + ' ' + hUnit + ' = ' + fmt(h_m) + ' m') +
           stepRow('Volume = L · W · H', fmt(volM3) + ' m³');
       } else {
-        const vVal = parseFloat(document.getElementById('lr_vol_direct').value);
-        const vUnit = document.getElementById('lr_vol_direct_unit').value;
-        if (isNaN(vVal)) {
-          resultsEl.innerHTML = '<div class="lr-error">Please enter a volume.</div>';
-          return;
+        if (geom === 'direct') {
+          const vVal = parseFloat(document.getElementById('lr_vol_direct').value);
+          const vUnit = document.getElementById('lr_vol_direct_unit').value;
+          if (isNaN(vVal)) {
+            resultsEl.innerHTML = '<div class="lr-error">Please enter a volume.</div>';
+            return;
+          }
+          if (vUnit === 'L') volM3 = vVal / 1000;
+          else if (vUnit === 'mL') volM3 = vVal / 1e6;
+          else if (vUnit === 'ft3') volM3 = vVal * FT3_TO_M3;
+          else volM3 = vVal; // m3
+          volSteps =
+            stepRow('Entered volume', fmt(vVal) + ' ' + vUnit) +
+            stepRow('Volume', fmt(volM3) + ' m³');
+        } else {
+          volM3 = updateKnownTotal();
+          if (!(volM3 > 0)) {
+            resultsEl.innerHTML = '<div class="lr-error">Select at least one known volume.</div>';
+            return;
+          }
+          const selectedNames = Array.from(knownChecks)
+            .filter((checkbox) => checkbox.checked)
+            .map((checkbox) => checkbox.closest('label')?.querySelector('strong')?.textContent || 'Unknown');
+          volSteps =
+            stepRow('Selected volumes', selectedNames.join(', ')) +
+            stepRow('Total known volume', fmt(volM3) + ' m³');
         }
-        if (vUnit === 'L') volM3 = vVal / 1000;
-        else if (vUnit === 'mL') volM3 = vVal / 1e6;
-        else if (vUnit === 'ft3') volM3 = vVal * FT3_TO_M3;
-        else volM3 = vVal; // m3
-        volSteps =
-          stepRow('Entered volume', fmt(vVal) + ' ' + vUnit) +
-          stepRow('Volume', fmt(volM3) + ' m³');
       }
 
       if (!(volM3 > 0)) {
