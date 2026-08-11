@@ -1259,7 +1259,9 @@
           With the default 33.56″ beam, 1 MJy sr<sup>−1</sup> = 30.0 mJy per beam, so
           10 MJy sr<sup>−1</sup> √s and 300 mJy √s are the same physical detector sensitivity.
           The numerical values are different because one is per steradian and the other is integrated over one beam.
-          The detector noise and desired sensitivity do not need to use the same unit system. 
+          The detector noise and desired sensitivity do not need to use the same unit system. The calculator converts each input independently through the beam solid angle before comparing them.
+          For example, with this beam, a detector NEFD of 300 mJy √s can be paired directly with a desired map sensitivity of 0.1 MJy sr<sup>−1</sup>; the calculator converts 300 mJy √s to the equivalent 10 MJy sr<sup>−1</sup> √s internally.
+          Likewise, a detector NEI of 10 MJy sr<sup>−1</sup> √s can be paired with a 3 mJy target. These two examples describe the same physical detector noise and target depth.
         </div>
         <div class="sens-grid">
           <label>Single-detector noise (NEI / NEFD)
@@ -1272,7 +1274,7 @@
             </select>
           </label>
           <label>Beam FWHM (arcsec)
-            <input id="sens_beam_fwhm" type="number" min="0" step="any" value="33.56">
+            <input id="sens_beam_fwhm" type="number" min="0" step="any" value="33.5622942582">
           </label>
           <label>Number of detectors
             <input id="sens_ndet" type="number" min="1" step="1" value="32">
@@ -1386,27 +1388,46 @@
   // Tab switching functionality
   const tabButtons = document.querySelectorAll('.tab-button');
   const tabContents = document.querySelectorAll('.tab-content');
-  
+  const ACTIVE_TAB_KEY = 'timeToolsActiveTab';
+
+  function activateTab(tabId, remember = true) {
+    const button = Array.from(tabButtons).find(btn => btn.dataset.tab === tabId);
+    const content = document.getElementById(tabId);
+
+    // Fall back safely if the saved tab no longer exists.
+    if (!button || !content) return false;
+
+    tabButtons.forEach(btn => btn.classList.remove('active'));
+    tabContents.forEach(tab => tab.classList.remove('active'));
+
+    button.classList.add('active');
+    content.classList.add('active');
+
+    if (remember) {
+      sessionStorage.setItem(ACTIVE_TAB_KEY, tabId);
+    }
+
+    // Trigger rack drawing if switching to or restoring the computer-rack tab.
+    if (tabId === 'computer-rack') {
+      setTimeout(() => {
+        initializeComputerRack();
+      }, 100);
+    }
+
+    return true;
+  }
+
   tabButtons.forEach(button => {
     button.addEventListener('click', () => {
-      const tabId = button.dataset.tab;
-      
-      // Remove active class from all tabs and buttons
-      tabButtons.forEach(btn => btn.classList.remove('active'));
-      tabContents.forEach(content => content.classList.remove('active'));
-      
-      // Add active class to clicked button and corresponding content
-      button.classList.add('active');
-      document.getElementById(tabId).classList.add('active');
-      
-      // Trigger rack drawing if switching to computer-rack tab
-      if (tabId === 'computer-rack') {
-        setTimeout(() => {
-          initializeComputerRack();
-        }, 100);
-      }
+      activateTab(button.dataset.tab);
     });
   });
+
+  // Restore the last-opened TIME Tools subpage for this browser session.
+  const savedTabId = sessionStorage.getItem(ACTIVE_TAB_KEY);
+  if (savedTabId) {
+    activateTab(savedTabId, false);
+  }
 
   // Computer Rack Data and Functions
   const rackData = {
