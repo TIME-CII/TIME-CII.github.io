@@ -856,6 +856,56 @@
     max-width: 720px;
     margin: 0 auto;
   }
+
+
+  /* ===== Sensitivity / Map Estimator styles ===== */
+  .sens-panel { max-width: 980px; margin: 0 auto; }
+  .sens-card{
+    border-radius: 18px;
+    border: 1px solid rgba(0,0,0,0.08);
+    background: rgba(255,255,255,0.9);
+    padding: 18px 22px;
+    margin: 0 auto 18px;
+    max-width: 820px;
+  }
+  .sens-card h3{ margin: 0 0 14px; font-family: 'Roboto', sans-serif; opacity: 0.9; }
+  .sens-grid{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px 18px; }
+  .sens-grid label{ display:flex; flex-direction:column; gap:5px; font-weight:600; font-size:0.9rem; }
+  .sens-grid input,.sens-grid select{
+    padding:9px 10px; border-radius:8px; border:1px solid rgba(0,0,0,0.18);
+    font:inherit; background:white;
+  }
+  .sens-toggle{ display:flex; gap:16px; flex-wrap:wrap; margin-bottom:14px; }
+  .sens-toggle label{ display:flex; align-items:center; gap:7px; font-weight:700; cursor:pointer; }
+  .sens-note{ font-size:0.88rem; line-height:1.5; opacity:0.72; margin-top:10px; }
+  .sens-formula{
+    margin-top:12px; padding:12px 14px; border-radius:12px;
+    background:rgba(11,79,122,0.06); border:1px solid rgba(11,79,122,0.14);
+    font-family:'SFMono-Regular',Consolas,monospace; font-size:0.88rem; line-height:1.6;
+  }
+  #sens_calculate{
+    display:block; margin:4px auto 22px; padding:12px 30px; border:none; border-radius:12px;
+    font-size:1rem; font-weight:700; color:white; cursor:pointer;
+    background:linear-gradient(135deg,#0b4f7a,#1d7fbf);
+  }
+  #sens_calculate:hover{ filter:brightness(1.06); }
+  .sens-results{ max-width:820px; margin:0 auto 40px; }
+  .sens-summary{
+    padding:20px; border-radius:14px; text-align:center;
+    background:linear-gradient(135deg,rgba(11,79,122,0.08),rgba(29,127,191,0.08));
+    border:1px solid rgba(11,79,122,0.2);
+  }
+  .sens-summary-label{ font-size:0.85rem; opacity:0.7; margin-bottom:4px; }
+  .sens-summary-value{ font-size:1.75rem; font-weight:800; color:#0b4f7a; }
+  .sens-summary-alt{ font-size:0.9rem; opacity:0.7; margin-top:6px; }
+  .sens-details{ margin-top:14px; }
+  .sens-step{ display:flex; justify-content:space-between; gap:18px; padding:8px 4px; border-bottom:1px dashed rgba(0,0,0,0.12); font-size:0.92rem; }
+  .sens-step span:first-child{ opacity:0.72; }
+  .sens-step span:last-child{ font-family:'SFMono-Regular',Consolas,monospace; font-weight:600; text-align:right; }
+  .sens-error{ color:#b42318; font-weight:700; text-align:center; padding:14px; }
+  .sens-2d-only.is-hidden,.sens-time-only.is-hidden,.sens-target-only.is-hidden{ display:none; }
+  @media (max-width:700px){ .sens-grid{ grid-template-columns:1fr; } }
+
 </style>
 </head>
 
@@ -897,6 +947,7 @@
     <button class="tab-button active" data-tab="detector-mapping">Detector Mapping</button>
     <button class="tab-button" data-tab="computer-rack">Computer Rack</button>
     <button class="tab-button" data-tab="leak-rate">Leak Rate Calculator</button>
+    <button class="tab-button" data-tab="sensitivity-estimator">Sensitivity Estimator</button>
   </div>
 
   <!-- Detector Mapping Tab -->
@@ -1089,7 +1140,7 @@
         <div id="lr_geom_rect" class="lr-geom-panel" style="display:none;">
           <label>Length
             <div class="lr-dim-group">
-              <input type="number" id="lr_rect_l" step="any" placeholder="e.g. 50">
+              <input type="number" id="lr_rect_l" step="any" placeholder="e.g. 30">
               <select id="lr_rect_l_unit">
                 <option value="cm">cm</option>
                 <option value="in">in</option>
@@ -1099,7 +1150,7 @@
           </label>
           <label>Width
             <div class="lr-dim-group">
-              <input type="number" id="lr_rect_w" step="any" placeholder="e.g. 40">
+              <input type="number" id="lr_rect_w" step="any" placeholder="e.g. 20">
               <select id="lr_rect_w_unit">
                 <option value="cm">cm</option>
                 <option value="in">in</option>
@@ -1109,7 +1160,7 @@
           </label>
           <label>Height
             <div class="lr-dim-group">
-              <input type="number" id="lr_rect_h" step="any" placeholder="e.g. 30">
+              <input type="number" id="lr_rect_h" step="any" placeholder="e.g. 10">
               <select id="lr_rect_h_unit">
                 <option value="cm">cm</option>
                 <option value="in">in</option>
@@ -1166,6 +1217,116 @@
 
       <div id="lr_results" class="lr-results"></div>
 
+    </section>
+  </div>
+
+
+
+  <!-- Sensitivity Estimator Tab -->
+  <div id="sensitivity-estimator" class="tab-content">
+    <section class="panel sens-panel">
+      <div style="text-align:center;">
+        <h2 style="margin:0 0 6px;">Sensitivity / Map Estimator</h2>
+        <p style="margin:0; opacity:0.8;">
+          Calculate sensitivity from observing time, or observing time from a target sensitivity.
+        </p>
+      </div>
+
+      <div class="sens-card">
+        <h3>Calculation</h3>
+        <div class="sens-toggle">
+          <label><input type="radio" name="sens_mode" value="time-to-sensitivity" checked> Observation time → sensitivity</label>
+          <label><input type="radio" name="sens_mode" value="sensitivity-to-time"> Target sensitivity → observation time</label>
+        </div>
+        <div class="sens-toggle">
+          <label><input type="radio" name="sens_geom" value="1d" checked> 1D repeated scans</label>
+          <label><input type="radio" name="sens_geom" value="2d"> 2D raster map</label>
+        </div>
+        <div class="sens-note">
+          In 1D mode every scan revisits the same line. In 2D mode successive scans step across the map, so the same total number of scans gives less integration time per spatial pixel.
+        </div>
+      </div>
+
+      <div class="sens-card">
+        <h3>Detector sensitivity</h3>
+        <div class="sens-note">
+          <strong>The two units explained.</strong>
+          <strong>MJy sr<sup>−1</sup> √s</strong> describes noise in surface brightness and is the natural unit for resolved or extended emission.
+          <strong>mJy √s</strong> describes noise in flux density for an unresolved source. An unresolved source does not have to be physically point-like:
+          it only needs to be smaller on the sky than the telescope beam, so the instrument cannot resolve structure across it and the source is measured as one beam-integrated flux.
+          The two descriptions are related by the beam solid angle, <em>S</em><sub>ν</sub> = <em>I</em><sub>ν</sub> Ω<sub>beam</sub>.
+          For a Gaussian beam, Ω<sub>beam</sub> = 1.1331 θ<sub>FWHM</sub><sup>2</sup>.
+          With the default 33.56″ beam, 1 MJy sr<sup>−1</sup> = 30.0 mJy per beam, so
+          10 MJy sr<sup>−1</sup> √s and 300 mJy √s are the same physical detector sensitivity.
+          The numerical values are different because one is per steradian and the other is integrated over one beam.
+          The detector noise and desired sensitivity do not need to use the same unit system. 
+        </div>
+        <div class="sens-grid">
+          <label>Single-detector noise (NEI / NEFD)
+            <input id="sens_nei" type="number" min="0" step="any" value="10">
+          </label>
+          <label>Single-detector noise units
+            <select id="sens_unit">
+              <option value="surface">MJy sr⁻¹ √s</option>
+              <option value="flux">mJy √s</option>
+            </select>
+          </label>
+          <label>Beam FWHM (arcsec)
+            <input id="sens_beam_fwhm" type="number" min="0" step="any" value="33.56">
+          </label>
+          <label>Number of detectors
+            <input id="sens_ndet" type="number" min="1" step="1" value="32">
+          </label>
+          <label class="sens-time-only">Total observation time (hours)
+            <input id="sens_obs_hours" type="number" min="0" step="any" value="1">
+          </label>
+          <label class="sens-target-only is-hidden">Desired sensitivity
+            <input id="sens_target" type="number" min="0" step="any" value="0.1">
+          </label>
+          <label class="sens-target-only is-hidden">Desired sensitivity units
+            <select id="sens_target_unit_select">
+              <option value="surface">MJy sr⁻¹</option>
+              <option value="flux">mJy</option>
+            </select>
+          </label>
+        </div>
+        <div id="sens_conversion_live" class="sens-note"></div>
+        <div class="sens-formula">
+          NEI<sub>array</sub> = NEI<sub>det</sub> / √N<sub>det</sub><br>
+          Ω<sub>beam</sub> = 1.1331 θ<sub>FWHM</sub><sup>2</sup><br>
+          S<sub>ν</sub> = I<sub>ν</sub> Ω<sub>beam</sub><br>
+          t<sub>pix,required</sub> = (NEI<sub>array</sub> / sensitivity)<sup>2</sup>
+        </div>
+      </div>
+
+      <div class="sens-card">
+        <h3>Scan geometry</h3>
+        <div class="sens-grid">
+          <label>Pixel size (deg)
+            <input id="sens_px" type="number" min="0" step="any" value="0.007">
+          </label>
+          <label>Scan speed (deg/s)
+            <input id="sens_speed" type="number" min="0" step="any" value="0.1">
+          </label>
+          <label>Scan length (deg)
+            <input id="sens_length" type="number" min="0" step="any" value="1.3">
+          </label>
+          <label class="sens-2d-only is-hidden">Map height (deg)
+            <input id="sens_height" type="number" min="0" step="any" value="1">
+          </label>
+          <label class="sens-2d-only is-hidden">Step size between scans (deg)
+            <input id="sens_step" type="number" min="0" step="any" value="0.007">
+          </label>
+        </div>
+        <div class="sens-formula">
+          t<sub>dwell,scan</sub> = pixel size / scan speed<br>
+          1D: t<sub>pix</sub> = N<sub>scans</sub> · t<sub>dwell,scan</sub><br>
+          2D: t<sub>pix</sub> = (N<sub>scans</sub> / N<sub>rows</sub>) · t<sub>dwell,scan</sub>, &nbsp; N<sub>rows</sub> = map height / step size
+        </div>
+      </div>
+
+      <button id="sens_calculate" type="button">Calculate</button>
+      <div id="sens_results" class="sens-results"></div>
     </section>
   </div>
 
@@ -2479,6 +2640,275 @@
       }
     });
   })();
+
+
+  // ===== Sensitivity / Map Estimator =====
+  (() => {
+    const q = (id) => document.getElementById(id);
+    const modeRadios = document.querySelectorAll('input[name="sens_mode"]');
+    const geomRadios = document.querySelectorAll('input[name="sens_geom"]');
+    const timeOnly = document.querySelectorAll('.sens-time-only');
+    const targetOnly = document.querySelectorAll('.sens-target-only');
+    const twoDOnly = document.querySelectorAll('.sens-2d-only');
+    const ARCSEC_PER_RAD = 206264.80624709636;
+
+    function currentMode(){ return document.querySelector('input[name="sens_mode"]:checked')?.value; }
+    function currentGeom(){ return document.querySelector('input[name="sens_geom"]:checked')?.value; }
+    function setHidden(nodes, hidden){ nodes.forEach(el => el.classList.toggle('is-hidden', hidden)); }
+
+    function sfmt(x, sig=6){
+      if (!Number.isFinite(x)) return '—';
+      if (x === 0) return '0';
+      const a = Math.abs(x);
+      if (a < 1e-4 || a >= 1e6) return x.toExponential(4);
+      return Number(x.toPrecision(sig)).toString();
+    }
+
+    function beamConversion(){
+      const beamFwhmArcsec = parseFloat(q('sens_beam_fwhm')?.value);
+      if (!Number.isFinite(beamFwhmArcsec) || beamFwhmArcsec <= 0) return null;
+      const thetaRad = beamFwhmArcsec / ARCSEC_PER_RAD;
+      const omegaSr = 1.1331 * thetaRad * thetaRad;
+      // 1 MJy/sr = 10^6 Jy/sr, and 1 Jy = 10^3 mJy.
+      const mJyPerMJySr = 1e9 * omegaSr;
+      return { beamFwhmArcsec, thetaRad, omegaSr, mJyPerMJySr };
+    }
+
+    function unitInfo(unit){
+      return unit === 'flux'
+        ? { nei: 'mJy √s', sensitivity: 'mJy' }
+        : { nei: 'MJy sr⁻¹ √s', sensitivity: 'MJy sr⁻¹' };
+    }
+
+    function toSurfaceBrightness(value, unit, conv){
+      return unit === 'flux' ? value / conv.mJyPerMJySr : value;
+    }
+
+    function fromSurfaceBrightness(value, unit, conv){
+      return unit === 'flux' ? value * conv.mJyPerMJySr : value;
+    }
+
+    function setNumericInput(id, value){
+      const el = q(id);
+      if (!el || !Number.isFinite(value)) return;
+      el.value = Number(value.toPrecision(10)).toString();
+    }
+
+    function updateConversionLive(){
+      const conv = beamConversion();
+      const detectorUnit = q('sens_unit')?.value || 'surface';
+      const targetUnit = q('sens_target_unit_select')?.value || 'surface';
+
+      const note = q('sens_conversion_live');
+      if (!note) return;
+      if (!conv) {
+        note.innerHTML = '<strong>Beam conversion:</strong> enter a beam FWHM greater than zero.';
+        return;
+      }
+      note.innerHTML =
+        '<strong>Current beam conversion:</strong> 1 MJy sr<sup>−1</sup> = ' +
+        sfmt(conv.mJyPerMJySr) + ' mJy per beam at ' + sfmt(conv.beamFwhmArcsec) +
+        '″ FWHM. Detector input: <strong>' + unitInfo(detectorUnit).nei +
+        '</strong>. Desired sensitivity: <strong>' + unitInfo(targetUnit).sensitivity +
+        '</strong>. The two inputs are converted independently before the sensitivity calculation.';
+    }
+
+    function updateSensitivityUI(){
+      const inverse = currentMode() === 'sensitivity-to-time';
+      setHidden(timeOnly, inverse);
+      setHidden(targetOnly, !inverse);
+      setHidden(twoDOnly, currentGeom() !== '2d');
+      updateConversionLive();
+    }
+
+    modeRadios.forEach(r => r.addEventListener('change', updateSensitivityUI));
+    geomRadios.forEach(r => r.addEventListener('change', updateSensitivityUI));
+
+    const unitSelect = q('sens_unit');
+    let previousDetectorUnit = unitSelect?.value || 'surface';
+    if (unitSelect) {
+      unitSelect.addEventListener('change', () => {
+        const nextUnit = unitSelect.value;
+        const conv = beamConversion();
+
+        // Convert only the detector noise when its unit selector changes.
+        // The desired sensitivity has its own independent unit selector.
+        if (conv && nextUnit !== previousDetectorUnit) {
+          const nei = parseFloat(q('sens_nei')?.value);
+          if (Number.isFinite(nei)) {
+            const neiSurface = toSurfaceBrightness(nei, previousDetectorUnit, conv);
+            setNumericInput('sens_nei', fromSurfaceBrightness(neiSurface, nextUnit, conv));
+          }
+        }
+
+        previousDetectorUnit = nextUnit;
+        updateConversionLive();
+      });
+    }
+
+    const targetUnitSelect = q('sens_target_unit_select');
+    let previousTargetUnit = targetUnitSelect?.value || 'surface';
+    if (targetUnitSelect) {
+      targetUnitSelect.addEventListener('change', () => {
+        const nextUnit = targetUnitSelect.value;
+        const conv = beamConversion();
+
+        // Convert only the desired sensitivity when its unit selector changes,
+        // preserving the same physical target depth.
+        if (conv && nextUnit !== previousTargetUnit) {
+          const target = parseFloat(q('sens_target')?.value);
+          if (Number.isFinite(target)) {
+            const targetSurface = toSurfaceBrightness(target, previousTargetUnit, conv);
+            setNumericInput('sens_target', fromSurfaceBrightness(targetSurface, nextUnit, conv));
+          }
+        }
+
+        previousTargetUnit = nextUnit;
+        updateConversionLive();
+      });
+    }
+
+    q('sens_beam_fwhm')?.addEventListener('input', updateConversionLive);
+    updateSensitivityUI();
+
+    function srow(label, value){
+      return '<div class="sens-step"><span>' + label + '</span><span>' + value + '</span></div>';
+    }
+
+    function durationText(seconds){
+      const hours = seconds / 3600;
+      const days = hours / 24;
+      if (days >= 1) return sfmt(seconds) + ' s = ' + sfmt(hours) + ' h = ' + sfmt(days) + ' d';
+      return sfmt(seconds) + ' s = ' + sfmt(hours) + ' h';
+    }
+
+    const btn = q('sens_calculate');
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+      const out = q('sens_results');
+      out.innerHTML = '';
+
+      const mode = currentMode();
+      const geom = currentGeom();
+      const neiDetInput = parseFloat(q('sens_nei').value);
+      const nDet = parseFloat(q('sens_ndet').value);
+      const px = parseFloat(q('sens_px').value);
+      const speed = parseFloat(q('sens_speed').value);
+      const length = parseFloat(q('sens_length').value);
+      const detectorUnit = q('sens_unit').value;
+      const targetUnit = q('sens_target_unit_select')?.value || 'surface';
+      const detectorLabels = unitInfo(detectorUnit);
+      const targetLabels = unitInfo(targetUnit);
+      const conv = beamConversion();
+      const height = geom === '2d' ? parseFloat(q('sens_height').value) : 0;
+      const step = geom === '2d' ? parseFloat(q('sens_step').value) : 0;
+
+      if (!conv) {
+        out.innerHTML = '<div class="sens-error">Beam FWHM must be greater than zero.</div>';
+        return;
+      }
+
+      const required = [neiDetInput,nDet,px,speed,length];
+      if (geom === '2d') required.push(height,step);
+      if (required.some(v => !Number.isFinite(v) || v <= 0)) {
+        out.innerHTML = '<div class="sens-error">All detector and scan-geometry inputs must be greater than zero.</div>';
+        return;
+      }
+
+      // Use MJy/sr internally so mJy and MJy/sr inputs are physically comparable.
+      const neiDetSurface = toSurfaceBrightness(neiDetInput, detectorUnit, conv);
+      const neiArraySurface = neiDetSurface / Math.sqrt(nDet);
+      const neiArrayDisplay = fromSurfaceBrightness(neiArraySurface, detectorUnit, conv);
+
+      const scanTime = length / speed;
+      const dwellPerScan = px / speed;
+      const pixelsAlongScan = length / px;
+      const nRows = geom === '2d' ? height / step : 1;
+      const mapPixelsEquivalent = pixelsAlongScan * nRows;
+
+      let totalTime, tPix, nScans, sensitivitySurface, sensitivityDisplay;
+      if (mode === 'time-to-sensitivity') {
+        const hours = parseFloat(q('sens_obs_hours').value);
+        if (!Number.isFinite(hours) || hours <= 0) {
+          out.innerHTML = '<div class="sens-error">Observation time must be greater than zero.</div>';
+          return;
+        }
+        totalTime = hours * 3600;
+        nScans = totalTime / scanTime;
+        tPix = (nScans / nRows) * dwellPerScan;
+        sensitivitySurface = neiArraySurface / Math.sqrt(tPix);
+        sensitivityDisplay = fromSurfaceBrightness(sensitivitySurface, detectorUnit, conv);
+      } else {
+        const targetInput = parseFloat(q('sens_target').value);
+        if (!Number.isFinite(targetInput) || targetInput <= 0) {
+          out.innerHTML = '<div class="sens-error">Desired sensitivity must be greater than zero.</div>';
+          return;
+        }
+        sensitivityDisplay = targetInput;
+        sensitivitySurface = toSurfaceBrightness(targetInput, targetUnit, conv);
+        tPix = Math.pow(neiArraySurface / sensitivitySurface, 2);
+        const repeatsPerRowNeeded = tPix / dwellPerScan;
+        nScans = repeatsPerRowNeeded * nRows;
+        totalTime = nScans * scanTime;
+      }
+
+      const sensitivityFlux = sensitivitySurface * conv.mJyPerMJySr;
+      const neiArrayFlux = neiArraySurface * conv.mJyPerMJySr;
+      const repeatsPerRow = nScans / nRows;
+      const primaryLabel = mode === 'time-to-sensitivity' ? 'Sensitivity reached' : 'Required observation time';
+      const primaryValue = mode === 'time-to-sensitivity'
+        ? sfmt(sensitivityDisplay) + ' ' + detectorLabels.sensitivity
+        : durationText(totalTime);
+
+      let primaryAlt;
+      if (mode === 'time-to-sensitivity') {
+        const equivalent = detectorUnit === 'surface'
+          ? sfmt(sensitivityFlux) + ' mJy for an unresolved source'
+          : sfmt(sensitivitySurface) + ' MJy sr⁻¹';
+        primaryAlt = '= ' + equivalent + ' at ' + sfmt(conv.beamFwhmArcsec) +
+          '″ FWHM; after ' + sfmt(totalTime / 3600) + ' h using ' + sfmt(nDet) + ' detectors';
+      } else {
+        primaryAlt = 'target entered as ' + sfmt(parseFloat(q('sens_target').value)) + ' ' + targetLabels.sensitivity +
+          ' = ' + sfmt(sensitivitySurface) + ' MJy sr⁻¹ = ' + sfmt(sensitivityFlux) +
+          ' mJy at ' + sfmt(conv.beamFwhmArcsec) + '″ FWHM';
+      }
+
+      let details = '';
+      details += srow('Beam FWHM', sfmt(conv.beamFwhmArcsec) + ' arcsec');
+      details += srow('Gaussian beam solid angle', sfmt(conv.omegaSr) + ' sr');
+      details += srow('Beam conversion', '1 MJy sr⁻¹ = ' + sfmt(conv.mJyPerMJySr) + ' mJy');
+      details += srow('Array noise = detector noise / √Ndet',
+        sfmt(neiArrayDisplay) + ' ' + detectorLabels.nei +
+        ' = ' + sfmt(neiArraySurface) + ' MJy sr⁻¹ √s = ' + sfmt(neiArrayFlux) + ' mJy √s');
+      details += srow('Time per scan = scan length / scan speed', sfmt(scanTime) + ' s');
+      details += srow('Dwell per pixel in one scan = pixel size / scan speed', sfmt(dwellPerScan) + ' s');
+      details += srow('Pixels along scan', sfmt(pixelsAlongScan));
+      if (geom === '2d') {
+        details += srow('Raster rows = map height / step size', sfmt(nRows));
+        details += srow('Equivalent spatial samples in raster', sfmt(mapPixelsEquivalent));
+      }
+      if (mode === 'sensitivity-to-time') {
+        details += srow('Desired sensitivity input',
+          sfmt(parseFloat(q('sens_target').value)) + ' ' + targetLabels.sensitivity +
+          ' = ' + sfmt(sensitivitySurface) + ' MJy sr⁻¹ = ' + sfmt(sensitivityFlux) + ' mJy');
+      }
+      details += srow('Total scan count', sfmt(nScans));
+      details += srow(geom === '2d' ? 'Average repeats per raster row' : 'Repeated passes over the 1D line', sfmt(repeatsPerRow));
+      details += srow('Integration time per spatial pixel', sfmt(tPix) + ' s');
+      details += srow('Total observation time', durationText(totalTime));
+      details += srow('Final sensitivity',
+        sfmt(sensitivitySurface) + ' MJy sr⁻¹ = ' + sfmt(sensitivityFlux) + ' mJy');
+
+      out.innerHTML =
+        '<div class="sens-summary">' +
+          '<div class="sens-summary-label">' + primaryLabel + '</div>' +
+          '<div class="sens-summary-value">' + primaryValue + '</div>' +
+          '<div class="sens-summary-alt">' + primaryAlt + '</div>' +
+        '</div>' +
+        '<div class="sens-details">' + details + '</div>';
+    });
+  })();
+
 </script>
 
 </body>
